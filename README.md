@@ -8,6 +8,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 - [x] skeleton
 - [x] _webpack_
+- [x] _express_
 
 ## IN PROGRESS
 
@@ -16,8 +17,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] _express_
-- [ ] _livereload_
+- [ ] _live reload_
 - [ ] _winston_
 - [ ] start
 - [ ] watch
