@@ -1,6 +1,9 @@
 // Modules
 import 'phaser';
 
+// Scenes
+import BootScene from './scenes/boot';
+
 // Declare configuration
 const config = {
   type: Phaser.AUTO,
@@ -13,7 +16,7 @@ const config = {
   },
   pixelArt: true,
   scene: [
-
+    BootScene
   ]
 };
 
