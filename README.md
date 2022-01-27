@@ -7,15 +7,17 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 ### RELEASE x.x.x
 
 - [x] skeleton
+- [x] _webpack_
 
 ## IN PROGRESS
+
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] _webpack_
-- [ ] serve client
+- [ ] _express_
+- [ ] _livereload_
 - [ ] _winston_
 - [ ] start
 - [ ] watch
