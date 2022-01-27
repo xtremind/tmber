@@ -3,6 +3,7 @@ import 'phaser';
 
 // Scenes
 import BootScene from './scenes/boot';
+import PreloadScene from './scenes/preload';
 
 // Declare configuration
 const config = {
@@ -16,7 +17,8 @@ const config = {
   },
   pixelArt: true,
   scene: [
-    BootScene
+    BootScene,
+    PreloadScene
   ]
 };
 

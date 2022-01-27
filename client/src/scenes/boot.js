@@ -9,7 +9,7 @@ class BootScene extends Scene {
   
     preload() {
       console.log("BootScene");
-      //this.scene.start('PreloadScene');
+      this.scene.start('PreloadScene');
     }
   
   }

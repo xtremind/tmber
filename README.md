@@ -13,6 +13,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] _winston_
 - [x] _phaser3_
 - [x] scene "boot"
+- [x] scene "preload"
 
 ## IN PROGRESS
 
