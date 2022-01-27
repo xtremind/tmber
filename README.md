@@ -9,15 +9,14 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] skeleton
 - [x] _webpack_
 - [x] _express_
+- [x] _live reload_
 
 ## IN PROGRESS
-
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] _live reload_
 - [ ] _winston_
 - [ ] start
 - [ ] watch
