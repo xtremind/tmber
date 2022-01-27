@@ -14,6 +14,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] _phaser3_
 - [x] scene "boot"
 - [x] scene "preload"
+- [x] stage "title"
 
 ## IN PROGRESS
 
@@ -22,7 +23,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] stage "main menu"
 - [ ] connect a player from client to server with socket.io
 - [ ] identify a player
 - [ ] stage "waiting"

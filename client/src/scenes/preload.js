@@ -1,4 +1,5 @@
 import {Scene} from 'phaser';
+import cardTable from 'images/cardTable.png';
 
 class PreloadScene extends Scene {
     constructor() {
@@ -12,8 +13,8 @@ class PreloadScene extends Scene {
     preload() {
       console.log("PreloadScene");
 
-      const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
-      const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
+      const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+      const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
       const loadingLabel = this.add.text(screenCenterX, screenCenterY-30, 'Loading ...', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
       const progressPercent = this.add.text(screenCenterX, screenCenterY+30, '', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
       const progressFile = this.add.text(screenCenterX, screenCenterY+60, '', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
@@ -47,11 +48,11 @@ class PreloadScene extends Scene {
         progressPercent.destroy();
         progressBox.destroy();
         progressBar.destroy();
-        //this.scene.start('TitleScene');
+        this.scene.start('TitleScene');
       });
   
       //Load all assets
-      //this.load.image('cardTable', 'public/img/cardTable.png');
+      this.load.image('cardTable', cardTable);
       //this.load.audio('playCard', 'public/audio/playcard.wav');
     }
   }

@@ -1,9 +1,10 @@
 // Modules
-import 'phaser';
+import {Game} from 'phaser';
 
 // Scenes
-import BootScene from './scenes/boot';
-import PreloadScene from './scenes/preload';
+import BootScene from 'scenes/boot';
+import PreloadScene from 'scenes/preload';
+import TitleScene from 'scenes/title';
 
 // Declare configuration
 const config = {
@@ -18,10 +19,11 @@ const config = {
   pixelArt: true,
   scene: [
     BootScene,
-    PreloadScene
+    PreloadScene,
+    TitleScene
   ]
 };
 
-var game = new Phaser.Game(config);
+var game = new Game(config);
 
 console.log("--- game started")
