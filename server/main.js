@@ -1,10 +1,13 @@
-//module
+// External modules
 const express = require('express')
 const path = require('path')
 const livereload = require("livereload");
 const connectLiveReload = require("connect-livereload");
 
-// configuration
+// Internal modules
+const logger = require('./application/configuration/logger')
+
+// Configuration
 const port = process.env.PORT || 3000;
 const DIST_DIR = path.join(__dirname, '../dist');
 
@@ -17,10 +20,10 @@ liveReloadServer.server.once("connection", () => {
 });
 liveReloadServer.watch(DIST_DIR);
 
-// prepare server
+// Prepare server
 const app = express();
 app.use(connectLiveReload()); // Allow Auto Reload on change on server side
 app.use(express.static(DIST_DIR)); // serve static
 
-//start server
-app.listen(port, () => console.log('listening on port: ' + port)) 
+// Start server 
+app.listen(port, () => logger.info('listening on port: ' + port))  
