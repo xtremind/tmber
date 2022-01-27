@@ -1,0 +1,20 @@
+{
+  "name": "tmber",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "an online version of timber game card",
+  "main": "server/main.js",
+  "scripts": {
+    "start": "node server/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtremind/tmber.git"
+  },
+  "author": "",
+  "license": "Beerware",
+  "bugs": {
+    "url": "https://github.com/xtremind/tmber/issues"
+  },
+  "homepage": "https://github.com/xtremind/tmber#readme"
+}
