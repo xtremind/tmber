@@ -11,6 +11,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] _express_
 - [x] _live reload_
 - [x] _winston_
+- [x] _phaser3_
 
 ## IN PROGRESS
 
@@ -19,10 +20,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] start
-- [ ] watch
-- [ ] _phaser_
-- [ ] _pixi_
 - [ ] stage "main menu"
 - [ ] connect a player from client to server with socket.io
 - [ ] identify a player
