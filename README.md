@@ -15,15 +15,14 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] scene "boot"
 - [x] scene "preload"
 - [x] stage "title"
+- [x] connect a player from client to server with socket.io
 
 ## IN PROGRESS
-
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] connect a player from client to server with socket.io
 - [ ] identify a player
 - [ ] stage "waiting"
 - [ ] add a player in a game

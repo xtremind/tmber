@@ -25,5 +25,14 @@ const app = express();
 app.use(connectLiveReload()); // Allow Auto Reload on change on server side
 app.use(express.static(DIST_DIR)); // serve static
 
+// prepare Socket.io Server
+const server = require('http').Server(app, {serveClient: false})
+const io = require('socket.io')(server)
+
+// listen socket
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+
 // Start server 
-app.listen(port, () => logger.info('listening on port: ' + port))  
+server.listen(port, () => logger.info('listening on port: ' + port))  

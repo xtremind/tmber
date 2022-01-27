@@ -1,5 +1,6 @@
 // Modules
 import {Game} from 'phaser';
+import { io } from 'socket.io-client'
 
 // Scenes
 import BootScene from 'scenes/boot';
@@ -26,4 +27,6 @@ const config = {
 
 var game = new Game(config);
 
-console.log("--- game started")
+// add socket client to game
+const socket = io();
+game.socket = socket;

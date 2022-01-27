@@ -35,6 +35,8 @@
   "dependencies": {
     "express": "^4.17.2",
     "phaser": "^3.55.2",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1",
     "winston": "^3.4.0"
   }
 }
