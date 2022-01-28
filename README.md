@@ -16,19 +16,21 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] scene "preload"
 - [x] stage "title"
 - [x] connect a player from client to server with socket.io
+- [x] identify a player
+- [x] disconnect a player
 
 ## IN PROGRESS
+
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] identify a player
+- [ ] name a player
 - [ ] stage "waiting"
 - [ ] add a player in a game
 - [ ] remove a player in a game
 - [ ] add a bot in a game
-- [ ] disconnect a player outside a starting game
 - [ ] stage "main menu"
 - [ ] bot
 - [ ] disconnect a player inside a starting game by replacing by a bot

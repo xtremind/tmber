@@ -28,5 +28,5 @@ const config = {
 var game = new Game(config);
 
 // add socket client to game
-const socket = io();
+const socket = io({reconnectionAttempts: 5 });
 game.socket = socket;

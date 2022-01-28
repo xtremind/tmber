@@ -5,7 +5,8 @@ const livereload = require("livereload");
 const connectLiveReload = require("connect-livereload");
 
 // Internal modules
-const logger = require('./application/configuration/logger')
+const logger = require('./utils/logger');
+const MainEngine = require('./engine/MainEngine');
 
 // Configuration
 const port = process.env.PORT || 3000;
@@ -29,10 +30,7 @@ app.use(express.static(DIST_DIR)); // serve static
 const server = require('http').Server(app, {serveClient: false})
 const io = require('socket.io')(server)
 
-// listen socket
-io.on('connection', (socket) => {
-  console.log('a user connected');
-});
-
 // Start server 
-server.listen(port, () => logger.info('listening on port: ' + port))  
+server.listen(port, () => logger.info('listening on port: ' + port)) 
+
+new MainEngine(io, logger).start();
