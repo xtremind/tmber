@@ -24,8 +24,6 @@ class TitleScene extends Scene {
     //add title
     const screenCenterX =
       sceneScope.cameras.main.worldView.x + sceneScope.cameras.main.width / 2;
-    const screenCenterY =
-      sceneScope.cameras.main.worldView.y + sceneScope.cameras.main.height / 2;
     sceneScope.add
       .text(screenCenterX, 100, "♥ ♣  Tmber  ♠ ♦", Styles.titleText)
       .setOrigin(0.5);
@@ -53,30 +51,56 @@ class TitleScene extends Scene {
 
     element.addListener("input");
 
-    element.on("input", function (event) {
+    element.on("input", () => {
       console.log("TitleScene.create - input : " + document.getElementById("nameField").value);
-      Cookies.set( "tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
+      Cookies.set("tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
       );
     });
 
-    sceneScope.sys.game.socket.on("game joined", function (party) {
+    sceneScope.sys.game.socket.emit('games', {});
+
+    //add listeners
+    sceneScope.sys.game.socket.on("joined", (party) => {
       sceneScope.gameJoined(party.id);
+    });
+
+    sceneScope.sys.game.socket.on("games", (parties) => {
+      // delete current join List            
+      for (var key in sceneScope.gameList) {
+        Graphics.del(sceneScope.gameList[key]);
+      }
+
+      sceneScope.gameList = [];
+      var position = 0;
+
+      // create new join List
+      parties.forEach((party) => {
+        sceneScope.gameList[party.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX+ 50, y: 210 + 70 * ++position, height: 50, width: 200 }, Styles.joinButton, 'join game', Styles.joinText, 'join game', 
+        () => {
+          //sceneScope.sys.game.playerName = playerName.value;
+          console.log("join game " + party.id);
+          sceneScope.sys.game.socket.emit('join', { id: party.id, name: document.getElementById("nameField").value });
+        });
+      });
     });
 
     //add rounded buttons
     Graphics.drawButton(sceneScope,
       {x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,width: 200,},
       Styles.hostButton, "host game", Styles.hostText, "host game",
-      function () {
+      () => {
         sceneScope.sys.game.socket.emit("host", {name: document.getElementById("nameField").value,});
       }
     );
+
+    //ask waiting games
+    sceneScope.sys.game.socket.emit('games', {});
   }
 
   gameJoined(id) {
     console.log("game joined " + id);
-    this.sys.game.socket.off("list games");
-    this.sys.game.socket.off("game joined");
+    this.sys.game.socket.off("games");
+    this.sys.game.socket.off("joined");
     this.sys.game.currentGameId = id;
     this.gameList = [];
     this.scene.start('WaitingScene'); 

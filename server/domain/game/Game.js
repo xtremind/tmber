@@ -14,11 +14,18 @@ class Game {
   }
 
   id(){
-    return this.#id
+    return this.#id;
+  }
+
+  players(){
+    return this.#players;
   }
 
   add(player){
-    this.#players.push(player);
+    if (!this.#players.some((p) => p.uuid() === player.uuid())){
+      //a player can only be added once
+      this.#players.push(player);
+    }
   }
 
   remove(player){
@@ -26,7 +33,7 @@ class Game {
   }
 
   replace(outgoingUser, incomingUser){
-    //change player by bot, or bot by player
+    //change player by bot, or bot by player if uuid are the same
   }
 
   status(){

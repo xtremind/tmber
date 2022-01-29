@@ -1,5 +1,6 @@
 const Player = require("./user/Player");
 const Game = require("./game/Game");
+const State = require("./game/State");
 
 class ManagementService {
 
@@ -12,31 +13,67 @@ class ManagementService {
   }
 
   connect(socket) {
-    this.#logger.debug("[SOCKET] connect a player: " + socket.id);
+    this.#logger.debug("["+socket.id+"] connected");
     this.#players.set(socket.id, new Player(socket));
   }
 
   identify(playerId, data) {
-    this.#logger.debug("[SOCKET] identify a player", data);
+    this.#logger.debug("["+playerId+"] identified", data);
     var currentPlayer = this.#players.get(playerId);
-    currentPlayer.uuid(data.uuid);
+    currentPlayer.setUuid(data.uuid);
+  }
+
+  games(playerId, data) {
+    this.#logger.debug("["+playerId+"] games", data);
+    this.#players.get(playerId).socket().emit("games", this.#waitingGames().map((game) => {return {"id": game.id()}}));
+  }
+
+  players(playerId, data) {
+    this.#logger.debug("["+playerId+"] players", data);
+    var currentPlayer = this.#players.get(playerId);
+    var currentGame = this.#games.get(data.id); 
+    currentPlayer.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
   }
 
   host(playerId, data) {
-    this.#logger.debug("[SOCKET] host a game", data);
+    this.#logger.debug("["+playerId+"] host a game", data);
     //name a player
     var currentPlayer = this.#players.get(playerId);
-    currentPlayer.name(data.name);
+    currentPlayer.setName(data.name);
     //create a game and add the player as host
-    var game = new Game(currentPlayer.uuid(), currentPlayer);
-    this.#games.set(game.id, game);
-    //answer game created
-    currentPlayer.socket().emit("game joined", { id: game.id() });
+    var currentGame = new Game(currentPlayer.uuid(), currentPlayer);
+    this.#games.set(currentGame.id(), currentGame);
+    //join created game
+    currentPlayer.socket().emit("joined", { id: currentGame.id() });
+    //update joinable games
+    currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id()}}));
+    // join a room to only communicate in
+    currentPlayer.socket().join(currentGame.id());
+  }
+ 
+  join(playerId, data)  {
+    this.#logger.debug("["+playerId+"] join a game", data);
+    //name a player
+    var currentPlayer = this.#players.get(playerId);
+    currentPlayer.setName(data.name);
+    //join a game
+    var currentGame = this.#games.get(data.id);
+    currentGame.add(currentPlayer);
+    //join game
+    currentPlayer.socket().emit("joined", { id: currentGame.id() });
+    // join a room to only communicate in
+    currentPlayer.socket().join(currentGame.id());
+    //update list player for joined game
+    currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
   }
 
   disconnect(playerId) {
-    this.#logger.debug("[SOCKET] disconnect a player: " + playerId);
+    this.#logger.debug("["+playerId+"] disconnected");
     this.#players.delete(playerId);
+  }
+
+  #waitingGames(){
+    return Array.from(this.#games.values()).filter(game => game.status() === State.WAITING);
   }
 }
 

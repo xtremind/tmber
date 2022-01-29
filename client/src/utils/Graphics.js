@@ -54,6 +54,12 @@
   return container;
 };
 
+const del = function(container){
+  container.destroy();
+  return null;
+}
+
 export default {
     drawButton,
+    del
 }

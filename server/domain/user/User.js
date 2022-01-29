@@ -10,7 +10,7 @@ class User {
     this.#isPlayer = isPlayer;
   }
 
-  uuid(uuid){
+  setUuid(uuid){
     this.#uuid = uuid;
   }
 
@@ -22,7 +22,7 @@ class User {
     return this.#socket;
   }
 
-  name(name){
+  setName(name){
     this.#name = name;
   }
 
