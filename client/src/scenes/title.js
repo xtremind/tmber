@@ -60,15 +60,14 @@ class TitleScene extends Scene {
     });
 
     //add rounded buttons
-    Graphics.drawButton(
-      sceneScope,{x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,
-        width: 200,
-      },
+    Graphics.drawButton(sceneScope,
+      {x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,width: 200,},
       Styles.hostButton, "host game", Styles.hostText, "host game",
       function () {
         sceneScope.sys.game.socket.emit("host game", {
           name: document.getElementById("nameField").value,
         });
+        sceneScope.scene.start('WaitingScene'); // TODO once server told that a game is joined
       }
     );
   }

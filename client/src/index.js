@@ -6,6 +6,7 @@ import { io } from 'socket.io-client'
 import BootScene from 'scenes/boot';
 import PreloadScene from 'scenes/preload';
 import TitleScene from 'scenes/title';
+import WaitingScene from 'scenes/waiting';
 
 // Declare configuration
 const config = {
@@ -24,7 +25,8 @@ const config = {
   scene: [
     BootScene,
     PreloadScene,
-    TitleScene
+    TitleScene,
+    WaitingScene
   ]
 };
 
