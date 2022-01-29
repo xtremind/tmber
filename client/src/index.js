@@ -17,6 +17,9 @@ const config = {
     width: 1200,
     height: 800,
   },
+  dom: {
+      createContainer: true
+  },
   pixelArt: true,
   scene: [
     BootScene,

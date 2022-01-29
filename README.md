@@ -18,6 +18,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] connect a player from client to server with socket.io
 - [x] identify a player
 - [x] disconnect a player
+- [x] name a player
 
 ## IN PROGRESS
 
@@ -26,7 +27,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] name a player
 - [ ] stage "waiting"
 - [ ] add a player in a game
 - [ ] remove a player in a game
