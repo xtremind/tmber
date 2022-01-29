@@ -59,17 +59,27 @@ class TitleScene extends Scene {
       );
     });
 
+    sceneScope.sys.game.socket.on("game joined", function (party) {
+      sceneScope.gameJoined(party.id);
+    });
+
     //add rounded buttons
     Graphics.drawButton(sceneScope,
       {x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,width: 200,},
       Styles.hostButton, "host game", Styles.hostText, "host game",
       function () {
-        sceneScope.sys.game.socket.emit("host game", {
-          name: document.getElementById("nameField").value,
-        });
-        sceneScope.scene.start('WaitingScene'); // TODO once server told that a game is joined
+        sceneScope.sys.game.socket.emit("host", {name: document.getElementById("nameField").value,});
       }
     );
+  }
+
+  gameJoined(id) {
+    console.log("game joined " + id);
+    this.sys.game.socket.off("list games");
+    this.sys.game.socket.off("game joined");
+    this.sys.game.currentGameId = id;
+    this.gameList = [];
+    this.scene.start('WaitingScene'); 
   }
 }
 

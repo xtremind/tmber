@@ -5,8 +5,8 @@ const livereload = require("livereload");
 const connectLiveReload = require("connect-livereload");
 
 // Internal modules
-const logger = require('./utils/logger');
-const MainEngine = require('./engine/MainEngine');
+const logger = require('./application/utils/logger');
+const MainEngine = require('./application/engine/MainEngine');
 
 // Configuration
 const port = process.env.PORT || 3000;

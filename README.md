@@ -20,14 +20,15 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] disconnect a player
 - [x] name a player
 - [x] stage "waiting"
+- [x] a player host a game
 
 ## IN PROGRESS
+
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] a player host a game
 - [ ] add a player in a game
 - [ ] remove a player in a game
 - [ ] add a bot in a game

@@ -10,16 +10,28 @@ class User {
     this.#isPlayer = isPlayer;
   }
 
-  setUuid(uuid){
+  uuid(uuid){
     this.#uuid = uuid;
   }
 
-  getUuid(){
+  uuid(){
     return this.#uuid;
   }
   
-  getSocket(){
+  socket(){
     return this.#socket;
+  }
+
+  name(name){
+    this.#name = name;
+  }
+
+  name(){
+    return this.#name;
+  }
+
+  isPlayer(){
+    return this.#isPlayer;
   }
 }
 
