@@ -31,23 +31,34 @@ class WaitingScene extends Scene {
       .text(sceneScope.cameras.main.centerX, 200, 'Game ' + sceneScope.sys.game.currentGameId, Styles.subtitleText)
       .setOrigin(0.5);
       
-      sceneScope.sys.game.socket.on("players", function (data) {
-        console.log("refresh list of players in the game");
-        // delete current List            
-        for (var key in sceneScope.playersList) {
-          Graphics.delete(sceneScope.playersList[key]);
-        }
+    //add interactive button
+    Graphics.drawButton(sceneScope,
+      {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
+      Styles.hostButton, "leave game", Styles.hostText, "leave game",
+      () => {
+        sceneScope.sys.game.socket.emit("leave", {id: sceneScope.sys.game.currentGameId,});
+        this.sys.game.socket.off("players");
+        this.scene.start('TitleScene');
+      }
+    );
 
-        sceneScope.playersList = [];
-        var position = 0;
-  
-        // create new join List
-        data.forEach(function (player) {
-          sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 70 * position, player.name, Styles.playerNameText)
-          position++;
-        });
-      })
+    //add listeners
+    sceneScope.sys.game.socket.on("players", function (data) {
+      console.log("refresh list of players in the game");
+      // delete current List            
+      for (var key in sceneScope.playersList) {
+        sceneScope.playersList[key].destroy();
+      }
 
+      sceneScope.playersList = [];
+      var position = 0;
+
+      // create new join List
+      data.forEach(function (player) {
+        sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 70 * position, player.name, Styles.playerNameText)
+        position++;
+      });
+    })
 
     //ask players in game
     sceneScope.sys.game.socket.emit('players', { id: sceneScope.sys.game.currentGameId });

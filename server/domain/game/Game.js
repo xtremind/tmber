@@ -30,6 +30,7 @@ class Game {
 
   remove(player){
     //remove a player from the list
+    this.#players = this.#players.filter(p => p.uuid() !== player.uuid());
   }
 
   replace(outgoingUser, incomingUser){

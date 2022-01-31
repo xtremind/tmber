@@ -67,6 +67,21 @@ class ManagementService {
     currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
   }
 
+  
+  leave(playerId, data)  {
+    this.#logger.debug("["+playerId+"] leave a game", data);
+    //name a player
+    var currentPlayer = this.#players.get(playerId);
+    //join a game
+    var currentGame = this.#games.get(data.id);
+    currentGame.remove(currentPlayer);
+    
+    //update list player for leaving game
+    currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+    // leave a room to only communicate in
+    currentPlayer.socket().leave(currentGame.id());
+  }
+
   disconnect(playerId) {
     this.#logger.debug("["+playerId+"] disconnected");
     this.#players.delete(playerId);

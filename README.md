@@ -23,6 +23,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] a player host a game
 - [x] list joinable games
 - [x] add a player in a game
+- [x] remove a player in waiting
 
 ## IN PROGRESS
 
@@ -31,13 +32,13 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] remove a player in a game
-- [ ] remove a host in a game
+- [ ] remove a host in waiting
 - [ ] add a bot in a game
 - [ ] stage "main menu"
 - [ ] bot
 - [ ] disconnect a player inside a starting game by replacing by a bot
 - [ ] reconnect a player to a game
+
 - [ ] define starting player
 - [ ] define current player
 - [ ] initialize deck

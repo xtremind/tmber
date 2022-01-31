@@ -23,6 +23,7 @@ class MainEngine {
       socket.on("players", (data) => stateScope.#managementService.players(socket.id, data));
       socket.on("host", (data) => stateScope.#managementService.host(socket.id, data));
       socket.on("join", (data) => stateScope.#managementService.join(socket.id, data));
+      socket.on("leave", (data) => stateScope.#managementService.leave(socket.id, data));
       socket.on("disconnect", (data) =>  stateScope.#managementService.disconnect(socket.id, data));
     });
   }
