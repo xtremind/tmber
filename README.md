@@ -24,6 +24,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] list joinable games
 - [x] add a player in a game
 - [x] remove a player in waiting
+- [x] remove a host in waiting
 
 ## IN PROGRESS
 
@@ -32,7 +33,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] remove a host in waiting
+- [ ] add link to game
+- [ ] join a waiting game given a link with id
 - [ ] add a bot in a game
 - [ ] stage "main menu"
 - [ ] bot

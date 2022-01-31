@@ -70,16 +70,22 @@ class ManagementService {
   
   leave(playerId, data)  {
     this.#logger.debug("["+playerId+"] leave a game", data);
-    //name a player
     var currentPlayer = this.#players.get(playerId);
-    //join a game
     var currentGame = this.#games.get(data.id);
-    currentGame.remove(currentPlayer);
-    
-    //update list player for leaving game
-    currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
-    // leave a room to only communicate in
-    currentPlayer.socket().leave(currentGame.id());
+    if(currentGame.isHostedBy(currentPlayer)){
+      // all should leave
+      currentPlayer.socket().to(currentGame.id()).emit("leave");
+      currentPlayer.socket().leave(currentGame.id());
+      currentGame.players().forEach((player => player.socket().leave(currentGame.id())))
+      // delete hosted game
+      this.#games.delete(currentGame.id());
+    } else {
+      currentGame.remove(currentPlayer);
+      //update list player for leaving game
+      currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+      // leave a room to only communicate in
+      currentPlayer.socket().leave(currentGame.id());
+    }
   }
 
   disconnect(playerId) {

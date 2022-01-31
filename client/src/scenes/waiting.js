@@ -36,9 +36,9 @@ class WaitingScene extends Scene {
       {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
       Styles.hostButton, "leave game", Styles.hostText, "leave game",
       () => {
+        console.log("player leave party");
         sceneScope.sys.game.socket.emit("leave", {id: sceneScope.sys.game.currentGameId,});
-        this.sys.game.socket.off("players");
-        this.scene.start('TitleScene');
+        sceneScope.#goToTitle();
       }
     );
 
@@ -60,8 +60,20 @@ class WaitingScene extends Scene {
       });
     })
 
+    sceneScope.sys.game.socket.on("leave", function (data) {
+      console.log("host player leave party");
+      sceneScope.#goToTitle();
+    });
+
     //ask players in game
     sceneScope.sys.game.socket.emit('players', { id: sceneScope.sys.game.currentGameId });
+  }
+
+  #goToTitle(){
+    console.log("WaitingScene.#goToTitle");
+    this.sys.game.socket.off("players");
+    this.sys.game.socket.off("leave");
+    this.scene.start('TitleScene');
   }
 }
 

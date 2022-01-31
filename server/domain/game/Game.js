@@ -41,6 +41,10 @@ class Game {
     return this.#status;
   }
 
+  isHostedBy(player){ 
+    return this.#host.uuid() === player.uuid();
+  }
+
 }
 
 module.exports = Game;
