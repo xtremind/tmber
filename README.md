@@ -14,7 +14,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] _phaser3_
 - [x] scene "boot"
 - [x] scene "preload"
-- [x] stage "title"
+- [x] scene "title"
 - [x] connect a player from client to server with socket.io
 - [x] identify a player
 - [x] disconnect a player
@@ -27,17 +27,20 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] remove a host in waiting
 - [x] add link to game
 - [x] add hostname in waiting game
+- [x] join a waiting game given a link with id
+- [x] leaving a game join by url didn"t rejoin th game
 
 ## IN PROGRESS
-
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] join a waiting game given a link with id
+- [ ] if join an inexisting game, go to title with error message
+- [ ] disconnect will remove player from game
+- [ ] changing name in waiting scene
 - [ ] add a bot in a game
-- [ ] stage "main menu"
+- [ ] scene "main menu"
 - [ ] bot
 - [ ] disconnect a player inside a starting game by replacing by a bot
 - [ ] reconnect a player to a game
@@ -60,7 +63,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] next play
 - [ ] define next starting player
 - [ ] end game (score > 100)
-- [ ] "score" stage
-- [ ] "achievement" stage
+- [ ] "score" scene
+- [ ] "achievement" scene
 - [ ] 
 

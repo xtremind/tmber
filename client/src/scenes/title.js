@@ -44,11 +44,9 @@ class TitleScene extends Scene {
 
     sceneScope.#addNameField(id, name);
 
-    sceneScope.sys.game.socket.emit('games', {});
-
     //add listeners
     sceneScope.sys.game.socket.on("joined", (party) => {
-      sceneScope.gameJoined(party);
+      sceneScope.#gameJoined(party);
     });
 
     sceneScope.sys.game.socket.on("games", (parties) => {
@@ -82,9 +80,16 @@ class TitleScene extends Scene {
 
     //ask waiting games
     sceneScope.sys.game.socket.emit('games', {});
+    
+    //detect if join game
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if(urlParams.has('g') && !this.sys.game.leaving){
+      sceneScope.#goToGame(urlParams);
+    }
   }
 
-  gameJoined(party) {
+  #gameJoined(party) {
     console.log("game joined " + party.id);
     this.sys.game.socket.off("games");
     this.sys.game.socket.off("joined");
@@ -110,6 +115,13 @@ class TitleScene extends Scene {
       Cookies.set("tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
       );
     });
+  }
+
+  #goToGame(urlParams){
+    var id = urlParams.get('g');
+    console.log("join game " + id);
+    this.sys.game.leaving = true;
+    this.sys.game.socket.emit('join', { id: id, name: document.getElementById("nameField").value });
   }
 }
 

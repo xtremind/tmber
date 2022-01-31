@@ -58,13 +58,18 @@ class ManagementService {
     currentPlayer.setName(data.name);
     //join a game
     var currentGame = this.#games.get(data.id);
-    currentGame.add(currentPlayer);
-    //join game
-    currentPlayer.socket().emit("joined", { id: currentGame.id() , "hostname": currentGame.hostname() });
-    // join a room to only communicate in
-    currentPlayer.socket().join(currentGame.id());
-    //update list player for joined game
-    currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+    
+    if (typeof currentGame !== "undefined") {
+      currentGame.add(currentPlayer);
+      //join game
+      currentPlayer.socket().emit("joined", { id: currentGame.id() , "hostname": currentGame.hostname() });
+      // join a room to only communicate in
+      currentPlayer.socket().join(currentGame.id());
+      //update list player for joined game
+      currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+    } else {
+      currentPlayer.socket().emit("error", { message: "unknown game" });
+    }
   }
 
   
