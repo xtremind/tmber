@@ -25,7 +25,7 @@ class ManagementService {
 
   games(playerId, data) {
     this.#logger.debug("["+playerId+"] games", data);
-    this.#players.get(playerId).socket().emit("games", this.#waitingGames().map((game) => {return {"id": game.id()}}));
+    this.#players.get(playerId).socket().emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
   }
 
   players(playerId, data) {
@@ -44,9 +44,9 @@ class ManagementService {
     var currentGame = new Game(currentPlayer.uuid(), currentPlayer);
     this.#games.set(currentGame.id(), currentGame);
     //join created game
-    currentPlayer.socket().emit("joined", { id: currentGame.id() });
+    currentPlayer.socket().emit("joined", { id: currentGame.id(), "hostname": currentGame.hostname() });
     //update joinable games
-    currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id()}}));
+    currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
     // join a room to only communicate in
     currentPlayer.socket().join(currentGame.id());
   }
@@ -60,7 +60,7 @@ class ManagementService {
     var currentGame = this.#games.get(data.id);
     currentGame.add(currentPlayer);
     //join game
-    currentPlayer.socket().emit("joined", { id: currentGame.id() });
+    currentPlayer.socket().emit("joined", { id: currentGame.id() , "hostname": currentGame.hostname() });
     // join a room to only communicate in
     currentPlayer.socket().join(currentGame.id());
     //update list player for joined game
@@ -79,6 +79,7 @@ class ManagementService {
       currentGame.players().forEach((player => player.socket().leave(currentGame.id())))
       // delete hosted game
       this.#games.delete(currentGame.id());
+      currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id()}}));
     } else {
       currentGame.remove(currentPlayer);
       //update list player for leaving game

@@ -42,26 +42,13 @@ class TitleScene extends Scene {
 
     sceneScope.sys.game.socket.emit("identify", { uuid: id });
 
-    var inputText = document.createElement("input");
-    inputText.placeholder = "Enter your name";
-    inputText.id = "nameField";
-    inputText.value = name;
-
-    var element = sceneScope.add.dom(screenCenterX, 200, inputText);
-
-    element.addListener("input");
-
-    element.on("input", () => {
-      console.log("TitleScene.create - input : " + document.getElementById("nameField").value);
-      Cookies.set("tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
-      );
-    });
+    sceneScope.#addNameField(id, name);
 
     sceneScope.sys.game.socket.emit('games', {});
 
     //add listeners
     sceneScope.sys.game.socket.on("joined", (party) => {
-      sceneScope.gameJoined(party.id);
+      sceneScope.gameJoined(party);
     });
 
     sceneScope.sys.game.socket.on("games", (parties) => {
@@ -97,13 +84,32 @@ class TitleScene extends Scene {
     sceneScope.sys.game.socket.emit('games', {});
   }
 
-  gameJoined(id) {
-    console.log("game joined " + id);
+  gameJoined(party) {
+    console.log("game joined " + party.id);
     this.sys.game.socket.off("games");
     this.sys.game.socket.off("joined");
-    this.sys.game.currentGameId = id;
+    this.sys.game.currentGameId = party.id;
+    this.sys.game.currentHostname = party.hostname;
     this.gameList = [];
     this.scene.start('WaitingScene'); 
+  }
+
+  #addNameField(id, name){
+    var inputText = document.createElement("input");
+    inputText.placeholder = "Enter your name";
+    inputText.id = "nameField";
+    inputText.value = name;
+    inputText.style="font-size: 32px"
+
+    var element = this.add.dom(this.cameras.main.worldView.x + this.cameras.main.width / 2, 200, inputText);
+
+    element.addListener("input");
+
+    element.on("input", () => {
+      console.log("TitleScene.create - input : " + document.getElementById("nameField").value);
+      Cookies.set("tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
+      );
+    });
   }
 }
 

@@ -28,9 +28,12 @@ class WaitingScene extends Scene {
 
     // add a subtitle
     sceneScope.add
-      .text(sceneScope.cameras.main.centerX, 200, 'Game ' + sceneScope.sys.game.currentGameId, Styles.subtitleText)
+      .text(sceneScope.cameras.main.centerX, 200, sceneScope.sys.game.currentHostname + '\'s Game', Styles.subtitleText)
       .setOrigin(0.5);
       
+    // add link to game
+    sceneScope.#addLinkToGame();
+
     //add interactive button
     Graphics.drawButton(sceneScope,
       {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
@@ -67,6 +70,35 @@ class WaitingScene extends Scene {
 
     //ask players in game
     sceneScope.sys.game.socket.emit('players', { id: sceneScope.sys.game.currentGameId });
+  }
+
+  #addLinkToGame(){
+    var div = document.createElement("div");
+    var gameField = document.createElement("input");
+    gameField.type="text"
+    gameField.id = "gameField";
+    gameField.disabled = "disabled"
+    gameField.value = document.URL + "?g="+ this.sys.game.currentGameId;
+    gameField.style="font-size: 32px"
+    div.appendChild(gameField);
+    
+    var copyButton = document.createElement("input");
+    copyButton.type="button"
+    copyButton.id = "copyButton";
+    copyButton.value="copy game's url"
+    copyButton.style="font-size: 32px"
+    div.appendChild(copyButton);
+
+    var element = this.add.dom(this.cameras.main.worldView.x + this.cameras.main.width / 2, this.cameras.main.worldView.y + this.cameras.main.height - 100, div);
+
+    element.addListener("click");
+
+    element.on("click", (event) => {
+      if (event.target.id === 'copyButton'){
+        console.log("WaitingScene.#addLinkToGame + copyButton" + document.getElementById("gameField").value);
+        navigator.clipboard.writeText(document.getElementById("gameField").value)
+      }
+    });
   }
 
   #goToTitle(){

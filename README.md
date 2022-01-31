@@ -25,6 +25,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] add a player in a game
 - [x] remove a player in waiting
 - [x] remove a host in waiting
+- [x] add link to game
+- [x] add hostname in waiting game
 
 ## IN PROGRESS
 
@@ -33,7 +35,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] add link to game
 - [ ] join a waiting game given a link with id
 - [ ] add a bot in a game
 - [ ] stage "main menu"

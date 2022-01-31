@@ -21,6 +21,10 @@ class Game {
     return this.#players;
   }
 
+  hostname(){
+    return this.#host.name();
+  }
+
   add(player){
     if (!this.#players.some((p) => p.uuid() === player.uuid())){
       //a player can only be added once
