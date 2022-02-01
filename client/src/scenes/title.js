@@ -49,6 +49,10 @@ class TitleScene extends Scene {
       sceneScope.#gameJoined(party);
     });
 
+    sceneScope.sys.game.socket.on("error", (data) => {
+      sceneScope.#showError(data.message);
+    });
+
     sceneScope.sys.game.socket.on("games", (parties) => {
       // delete current join List            
       for (var key in sceneScope.gameList) {
@@ -93,6 +97,7 @@ class TitleScene extends Scene {
     console.log("game joined " + party.id);
     this.sys.game.socket.off("games");
     this.sys.game.socket.off("joined");
+    this.sys.game.socket.off("error");
     this.sys.game.currentGameId = party.id;
     this.sys.game.currentHostname = party.hostname;
     this.gameList = [];
@@ -123,6 +128,33 @@ class TitleScene extends Scene {
     this.sys.game.leaving = true;
     this.sys.game.socket.emit('join', { id: id, name: document.getElementById("nameField").value });
   }
+
+  #showError(message){
+    console.log("error " + message);
+    var errorMessage = this.add.text(this.cameras.main.worldView.x + this.cameras.main.width / 2, 50, message, { font: '32px Courier bold', fill: '#FF5733' });
+    errorMessage.setOrigin(0.5);
+    errorMessage.setAlpha(0);
+
+    this.tweens.add({
+        targets: errorMessage,
+        alpha: 1,
+        delay: 0,
+        duration: 1000,
+        onComplete : () => {
+          this.tweens.add({
+            targets: errorMessage,
+            alpha: 0,
+            delay: 2000,
+            duration: 1000,
+            onComplete : () => {
+              errorMessage.destroy()
+            }
+        });
+        }
+    });
+
+  }
+
 }
 
 export default TitleScene;

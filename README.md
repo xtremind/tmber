@@ -29,6 +29,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] add hostname in waiting game
 - [x] join a waiting game given a link with id
 - [x] leaving a game join by url didn"t rejoin th game
+- [x] if join an nonexisting game, go to title with error message
 
 ## IN PROGRESS
 
@@ -36,7 +37,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] if join an inexisting game, go to title with error message
 - [ ] disconnect will remove player from game
 - [ ] changing name in waiting scene
 - [ ] add a bot in a game
