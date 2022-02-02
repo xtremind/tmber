@@ -41,6 +41,7 @@ class TitleScene extends Scene {
     }
 
     sceneScope.sys.game.socket.emit("identify", { uuid: id });
+    sceneScope.sys.game.currentUuid = id;
 
     sceneScope.#addNameField(id, name);
 

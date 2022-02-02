@@ -28,7 +28,7 @@ class WaitingScene extends Scene {
 
     // add a subtitle
     sceneScope.add
-      .text(sceneScope.cameras.main.centerX, 200, sceneScope.sys.game.currentHostname + '\'s Game', Styles.subtitleText)
+      .text(screenCenterX, 200, sceneScope.sys.game.currentHostname + '\'s Game', Styles.subtitleText)
       .setOrigin(0.5);
       
     // add link to game
@@ -58,9 +58,12 @@ class WaitingScene extends Scene {
 
       // create new join List
       data.forEach(function (player) {
-        sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 70 * position, player.name, Styles.playerNameText)
+        sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 50 * position, player.name, Styles.playerNameText)
         position++;
       });
+
+      sceneScope.#addBotButton(data.length)
+
     })
 
     sceneScope.sys.game.socket.on("leave", function (data) {
@@ -70,6 +73,23 @@ class WaitingScene extends Scene {
 
     //ask players in game
     sceneScope.sys.game.socket.emit('players', { id: sceneScope.sys.game.currentGameId });
+  }
+
+  #addBotButton(nbPlayers){
+    const sceneScope = this;
+    // if hoster : button add Bot if less than 8 players
+    if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
+      if (typeof sceneScope.addBotButton == "undefined" && nbPlayers < 8 ){
+        sceneScope.addBotButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
+          console.log("add bot");
+          sceneScope.sys.game.socket.emit('add bot', { id: sceneScope.sys.game.currentGameId });
+        });
+      }
+      if (typeof sceneScope.addBotButton != "undefined" && nbPlayers >= 8){
+        sceneScope.addBotButton.destroy()
+        sceneScope.addBotButton = undefined;
+      }
+    }
   }
 
   #addLinkToGame(){

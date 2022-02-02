@@ -31,17 +31,18 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] leaving a game join by url didn"t rejoin th game
 - [x] if join an nonexisting game, go to title with error message
 - [x] disconnect will remove player from game
+- [x] add a bot in a waiting game
 
 ## IN PROGRESS
+
+
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] adding intermediary scene to change name between "title" and "waiting" scene
-- [ ] add a bot in a game
+- [ ] remove a bot in a waiting game
 - [ ] scene "game"
-- [ ] bot
 - [ ] disconnect a known player inside a running game by replacing by a bot
 - [ ] reconnect a known player to a running game
 - [ ] don't allow a unknown player to join a running game
@@ -68,3 +69,4 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] "achievement" scene
 - [ ] 
 
+- [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene

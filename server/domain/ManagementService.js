@@ -1,6 +1,8 @@
 const Player = require("./user/Player");
+const Bot = require("./user/Bot");
 const Game = require("./game/Game");
 const State = require("./game/State");
+const { v4: uuidv4 }  = require("uuid");
 
 class ManagementService {
 
@@ -32,7 +34,7 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] players", data);
     var currentPlayer = this.#players.get(playerId);
     var currentGame = this.#games.get(data.id); 
-    currentPlayer.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+    currentPlayer.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
   }
 
   host(playerId, data) {
@@ -68,18 +70,37 @@ class ManagementService {
       // join a room to only communicate in
       currentPlayer.socket().join(currentGame.id());
       //update list player for joined game
-      currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+      currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
     } else {
       currentPlayer.socket().emit("error", { message: "unknown game" });
     }
   }
+
+  addBot(playerId, data)  {
+    this.#logger.debug("["+playerId+"] add a bot", data);
+    var currentGame = this.#games.get(data.id);
+    if (typeof currentGame !== "undefined") {
+      var bot = new Bot();
+      bot.setUuid(uuidv4()); 
+      bot.goInGame(currentGame.id());
+      currentGame.add(bot);
+      currentGame.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+      currentGame.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+    }
+  }
   
   leave(playerId, data)  {
-    this.#logger.debug("["+playerId+"] leave a game", data);
+    this.#logger.debug("["+playerId+"] leaving a game", data);
     var currentPlayer = this.#players.get(playerId);
     var currentGame = this.#games.get(data.id);
     
-    this.#leaveGame(playerId, currentPlayer, currentGame)
+    currentPlayer.leaveGame();
+    if (typeof currentGame !== "undefined") {
+      this.#leaveGame(playerId, currentPlayer, currentGame);
+      this.#logger.debug("["+playerId+"] left from game");
+    } else {
+      this.#logger.debug("["+playerId+"] left");
+    }
   }
 
   disconnect(playerId) {
@@ -89,6 +110,7 @@ class ManagementService {
     //find game if he is in one
     var currentGame = this.#games.get(currentPlayer.inGame());
     
+    currentPlayer.leaveGame();
     if (typeof currentGame !== "undefined") {
       this.#leaveGame(playerId, currentPlayer, currentGame);
       this.#logger.debug("["+playerId+"] disconnected from game");
@@ -100,7 +122,6 @@ class ManagementService {
 
   #leaveGame(playerId, player, game){
     this.#logger.debug("["+playerId+"] leave game");
-    player.leaveGame();
     if(game.isHostedBy(player)){
       this.#leaveGameAsHost(playerId, player, game)
     } else {
@@ -127,7 +148,7 @@ class ManagementService {
     // all should leave
     player.socket().to(game.id()).emit("leave");
     player.socket().leave(game.id());
-    game.players().forEach((p => p.socket().leave(game.id())))
+    game.players().forEach((p => p.isPlayer() && p.socket().leave(game.id())))
     // delete hosted game
     this.#games.delete(game.id());
     player.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id()}}));
@@ -137,7 +158,7 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] leave game as player");
     game.remove(player);
     //update list player for leaving game 
-    player.socket().to(game.id()).emit("players", game.players().map((p) => {return {"id": p.uuid(), "name": p.name()}}));
+    player.socket().to(game.id()).emit("players", game.players().map((p) => {return {"id": p.uuid(), "name": p.name(), "isPlayer": player.isPlayer()}}));
     // leave a room to only communicate in
     player.socket().leave(game.id());
   }
