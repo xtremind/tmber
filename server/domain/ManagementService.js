@@ -54,7 +54,7 @@ class ManagementService {
     currentPlayer.socket().join(currentGame.id());
   }
  
-  join(playerId, data)  {
+  join(playerId, data) {
     this.#logger.debug("["+playerId+"] join a game", data);
     //name a player
     var currentPlayer = this.#players.get(playerId);
@@ -76,20 +76,36 @@ class ManagementService {
     }
   }
 
-  addBot(playerId, data)  {
+  addBot(playerId, data) {
     this.#logger.debug("["+playerId+"] add a bot", data);
     var currentGame = this.#games.get(data.id);
     if (typeof currentGame !== "undefined") {
       var bot = new Bot();
       bot.setUuid(uuidv4()); 
       bot.goInGame(currentGame.id());
+      this.#players.set(bot.uuid(), bot);
       currentGame.add(bot);
       currentGame.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
-      currentGame.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name()}}));
+      currentGame.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
     }
   }
+
+  removeBot(playerId, data) {
+    this.#logger.debug("["+playerId+"] removing a bot", data);
+    var currentBot = this.#players.get(data.id);
+    var currentGame = this.#games.get(currentBot.inGame());
+    
+    currentBot.leaveGame();
+    if (typeof currentGame !== "undefined") {
+      this.#leaveGameAsBot(playerId, currentBot, currentGame);
+      this.#logger.debug("["+currentBot.uuid()+"] removed from game");
+    } else {
+      this.#logger.debug("["+currentBot.uuid()+"] removed");
+    }
+
+  }
   
-  leave(playerId, data)  {
+  leave(playerId, data) {
     this.#logger.debug("["+playerId+"] leaving a game", data);
     var currentPlayer = this.#players.get(playerId);
     var currentGame = this.#games.get(data.id);
@@ -158,9 +174,16 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] leave game as player");
     game.remove(player);
     //update list player for leaving game 
-    player.socket().to(game.id()).emit("players", game.players().map((p) => {return {"id": p.uuid(), "name": p.name(), "isPlayer": player.isPlayer()}}));
+    player.socket().to(game.id()).emit("players", game.players().map((p) => {return {"id": p.uuid(), "name": p.name(), "isPlayer": p.isPlayer()}}));
     // leave a room to only communicate in
     player.socket().leave(game.id());
+  }
+
+  #leaveGameAsBot(playerId, bot, game){
+    this.#logger.debug("["+playerId+"] leave game as player");
+    game.remove(bot);
+    game.socket().to(game.id()).emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+    game.socket().emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
   }
 
   #waitingGames(){

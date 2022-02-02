@@ -52,13 +52,24 @@ class WaitingScene extends Scene {
       for (var key in sceneScope.playersList) {
         sceneScope.playersList[key].destroy();
       }
-
       sceneScope.playersList = [];
+
+      for(var key in sceneScope.botsList) {
+        sceneScope.botsList[key].destroy();
+      }      
+      sceneScope.botsList = [];
+
       var position = 0;
 
       // create new join List
       data.forEach(function (player) {
         sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 50 * position, player.name, Styles.playerNameText)
+        if(sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid && !player.isPlayer){
+          sceneScope.botsList[player.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX + 300, y: 230 + 50 * position, height: 40, width: 200 }, Styles.startButton, 'Remove', Styles.startText, 'Remove', function () {
+            console.log("remove bot");
+            sceneScope.sys.game.socket.emit('remove bot', { id: player.id });
+          });
+        }
         position++;
       });
 
@@ -125,6 +136,7 @@ class WaitingScene extends Scene {
     console.log("WaitingScene.#goToTitle");
     this.sys.game.socket.off("players");
     this.sys.game.socket.off("leave");
+    this.addBotButton = undefined;
     this.scene.start('TitleScene');
   }
 }

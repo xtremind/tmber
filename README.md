@@ -32,6 +32,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] if join an nonexisting game, go to title with error message
 - [x] disconnect will remove player from game
 - [x] add a bot in a waiting game
+- [x] remove a bot in a waiting game
 
 ## IN PROGRESS
 
@@ -41,7 +42,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] remove a bot in a waiting game
+- [ ] if too many player a game, refresh game list without it
 - [ ] scene "game"
 - [ ] disconnect a known player inside a running game by replacing by a bot
 - [ ] reconnect a known player to a running game

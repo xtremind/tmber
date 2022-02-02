@@ -24,6 +24,7 @@ class MainEngine {
       socket.on("host", (data) => stateScope.#managementService.host(socket.id, data));
       socket.on("join", (data) => stateScope.#managementService.join(socket.id, data));
       socket.on("add bot", (data) => stateScope.#managementService.addBot(socket.id, data));
+      socket.on("remove bot", (data) => stateScope.#managementService.removeBot(socket.id, data));
       socket.on("leave", (data) => stateScope.#managementService.leave(socket.id, data));
       socket.on("disconnect", (data) =>  stateScope.#managementService.disconnect(socket.id, data));
     });
