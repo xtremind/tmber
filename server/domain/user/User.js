@@ -4,6 +4,7 @@ class User {
   #socket = {};       // socket to communicate with player
   #name = ""          // name 
   #isPlayer = null;   // type of user
+  #inGame = undefined;     // id of game where the user is
 
   constructor(socket, isPlayer) {
     this.#socket = socket;
@@ -32,6 +33,18 @@ class User {
 
   isPlayer(){
     return this.#isPlayer;
+  }
+
+  inGame(){
+    return this.#inGame
+  }
+
+  goInGame(inGame){
+    this.#inGame = inGame;
+  }
+
+  leaveGame(){
+    this.#inGame = undefined;
   }
 }
 
