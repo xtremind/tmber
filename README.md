@@ -33,16 +33,15 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] disconnect will remove player from game
 - [x] add a bot in a waiting game
 - [x] remove a bot in a waiting game
+- [x] if too many player/bot a game, refresh game list without it
 
 ## IN PROGRESS
-
 
 
 ## BLOCKED
 
 ## TODO
 
-- [ ] if too many player a game, refresh game list without it
 - [ ] scene "game"
 - [ ] disconnect a known player inside a running game by replacing by a bot
 - [ ] reconnect a known player to a running game

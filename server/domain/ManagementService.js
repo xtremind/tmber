@@ -63,6 +63,9 @@ class ManagementService {
     var currentGame = this.#games.get(data.id);
     
     if (typeof currentGame !== "undefined") {
+      if(currentGame.players().length > 8 ){
+        currentPlayer.socket().emit("error", { message: "too many player in game" });
+      }
       currentGame.add(currentPlayer);
       currentPlayer.goInGame(currentGame.id());
       //join game
@@ -71,6 +74,9 @@ class ManagementService {
       currentPlayer.socket().join(currentGame.id());
       //update list player for joined game
       currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+      if(currentGame.players().length >= 8 ){
+        currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
+      }
     } else {
       currentPlayer.socket().emit("error", { message: "unknown game" });
     }
@@ -80,6 +86,9 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] add a bot", data);
     var currentGame = this.#games.get(data.id);
     if (typeof currentGame !== "undefined") {
+      if(currentGame.players().length > 8 ){
+        currentPlayer.socket().emit("error", { message: "too many player in game" });
+      }
       var bot = new Bot();
       bot.setUuid(uuidv4()); 
       bot.goInGame(currentGame.id());
@@ -87,6 +96,9 @@ class ManagementService {
       currentGame.add(bot);
       currentGame.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
       currentGame.socket().emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+      if(currentGame.players().length >= 8 ){
+        currentGame.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
+      }
     }
   }
 
@@ -177,6 +189,9 @@ class ManagementService {
     player.socket().to(game.id()).emit("players", game.players().map((p) => {return {"id": p.uuid(), "name": p.name(), "isPlayer": p.isPlayer()}}));
     // leave a room to only communicate in
     player.socket().leave(game.id());
+    if(game.players().length < 8 ){
+      game.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id(), "hostname": g.hostname()}}));
+    }
   }
 
   #leaveGameAsBot(playerId, bot, game){
@@ -184,10 +199,13 @@ class ManagementService {
     game.remove(bot);
     game.socket().to(game.id()).emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
     game.socket().emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+    if(game.players().length < 8 ){
+      game.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id(), "hostname": g.hostname()}}));
+    }
   }
 
   #waitingGames(){
-    return Array.from(this.#games.values()).filter(game => game.status() === State.WAITING);
+    return Array.from(this.#games.values()).filter(game => game.status() === State.WAITING && game.players().length < 8);
   }
 }
 
