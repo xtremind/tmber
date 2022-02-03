@@ -35,6 +35,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] remove a bot in a waiting game
 - [x] if too many player/bot a game, refresh game list without it
 - [x] scene "game"
+- [x] start game
 
 ## IN PROGRESS
 
@@ -43,8 +44,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] start game
 - [ ] disconnect a known player inside a running game by replacing by a bot
+- [ ] end game when last player disconnect
 - [ ] reconnect a known player to a running game
 - [ ] don't allow a unknown player to join a running game
 - [ ] TU for service on server side

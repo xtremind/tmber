@@ -131,6 +131,26 @@ class ManagementService {
     }
   }
 
+  start(playerId, data) {
+    this.#logger.debug("["+playerId+"] start a game", data);
+    var currentPlayer = this.#players.get(playerId);
+    var currentGame = this.#games.get(data.id);
+
+    if (typeof currentGame !== "undefined") {
+      if (currentGame.isReadyToStart()){
+        //prepare game
+        currentGame.start();
+        currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id()}}));
+        return currentGame;
+      } else {
+        this.#logger.debug("["+playerId+"] game cannot be started yet");
+      }
+    } else {
+      this.#logger.debug("["+playerId+"] unknown game");
+    }
+    return;
+  }
+
   disconnect(playerId) {
     this.#logger.debug("["+playerId+"] disconnecting...");
     // get player 
@@ -205,7 +225,7 @@ class ManagementService {
   }
 
   #waitingGames(){
-    return Array.from(this.#games.values()).filter(game => game.status() === State.WAITING && game.players().length < 8);
+    return Array.from(this.#games.values()).filter(game => game.isWaitingPlayer());
   }
 }
 

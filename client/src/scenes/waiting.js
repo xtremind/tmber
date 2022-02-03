@@ -39,7 +39,7 @@ class WaitingScene extends Scene {
       .setOrigin(0.5);
       
     this.#addLinkToGame();
-    this.#addLeaveButton()
+    this.#addLeaveButton();
 
   }
 
@@ -81,19 +81,20 @@ class WaitingScene extends Scene {
       {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
       Styles.hostButton, "leave game", Styles.hostText, "leave game",
       () => {
-        console.log("WaitingScene.create - player leave party");
+        console.log("WaitingScene.#addLeaveButton - player leave party");
         sceneScope.sys.game.socket.emit("leave", {id: sceneScope.sys.game.currentGameId,});
         sceneScope.#goToTitle();
       }
     );
   }
 
+
   #addListeners(){
     console.log("WaitingScene.#addListener");
     const sceneScope = this;
     //add listeners
     sceneScope.sys.game.socket.on("players", function (data) {
-      console.log("WaitingScene.create - refresh list of players in the game");
+      console.log("WaitingScene.#addListeners - refresh list of players in the game");
       sceneScope.#cleanPlayers()
       sceneScope.#cleanBots();
       var position = 0;
@@ -103,6 +104,7 @@ class WaitingScene extends Scene {
         sceneScope.#showPlayer(player, position++);
       });
 
+      sceneScope.#addStartButton(data.length)
       sceneScope.#addBotButton(data.length)
 
     })
@@ -110,6 +112,11 @@ class WaitingScene extends Scene {
     sceneScope.sys.game.socket.on("leave", function (data) {
       console.log("WaitingScene.create - host player leave party");
       sceneScope.#goToTitle();
+    });
+    
+    sceneScope.sys.game.socket.on("ready?", function (data) {
+      console.log("WaitingScene.create - host player leave party");
+      sceneScope.#goToGame();
     });
   }
 
@@ -141,30 +148,65 @@ class WaitingScene extends Scene {
     this.botsList = [];
   }
 
+  #addStartButton(nbPlayers){
+    console.log("WaitingScene.#addStartButton");
+    const sceneScope = this;
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
+      if (typeof sceneScope.startButton == "undefined" && nbPlayers > 2 ){
+        sceneScope.startButton = Graphics.drawButton(sceneScope,
+          {x: screenCenterX - 200, y: 350, height: 50,width: 200,},
+          Styles.hostButton, "start game", Styles.hostText, "start game",
+          () => {
+            console.log("WaitingScene.#addStartButton - start game");
+            sceneScope.sys.game.socket.emit("start", {id: sceneScope.sys.game.currentGameId,});
+          }
+        );
+      }
+      if (typeof sceneScope.startButton != "undefined" && nbPlayers <= 2){
+        sceneScope.startButton.destroy()
+        sceneScope.startButton = undefined;
+      }
+    }
+  }
+
   #addBotButton(nbPlayers){
     console.log("WaitingScene.#addBotButton");
     const sceneScope = this;
     // if hoster : button add Bot if less than 8 players
     if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
-      if (typeof sceneScope.addBotButton == "undefined" && nbPlayers < 8 ){
-        sceneScope.addBotButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
+      if (typeof sceneScope.botButton == "undefined" && nbPlayers < 8 ){
+        sceneScope.botButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
           console.log("WaitingScene.create - add bot");
           sceneScope.sys.game.socket.emit('add bot', { id: sceneScope.sys.game.currentGameId });
         });
       }
-      if (typeof sceneScope.addBotButton != "undefined" && nbPlayers >= 8){
-        sceneScope.addBotButton.destroy()
-        sceneScope.addBotButton = undefined;
+      if (typeof sceneScope.botButton != "undefined" && nbPlayers >= 8){
+        sceneScope.botButton.destroy()
+        sceneScope.botButton = undefined;
       }
     }
   }
 
   #goToTitle(){
     console.log("WaitingScene.#goToTitle");
+    this.#removeListeners();
+    this.scene.start('TitleScene');
+  }
+
+  #goToGame(){
+    console.log("WaitingScene.#goToGame");
+    this.#removeListeners();
+    this.scene.start('GameScene');
+  }
+
+  #removeListeners(){
+    console.log("WaitingScene.#removeListeners");
     this.sys.game.socket.off("players");
     this.sys.game.socket.off("leave");
-    this.addBotButton = undefined;
-    this.scene.start('TitleScene');
+    this.sys.game.socket.off("start");
+    this.botButton = undefined;
+    this.startButton = undefined;
   }
 }
 

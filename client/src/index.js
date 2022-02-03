@@ -7,6 +7,7 @@ import BootScene from 'scenes/boot';
 import PreloadScene from 'scenes/preload';
 import TitleScene from 'scenes/title';
 import WaitingScene from 'scenes/waiting';
+import GameScene from 'scenes/game';
 
 // Declare configuration
 const config = {
@@ -26,7 +27,8 @@ const config = {
     BootScene,
     PreloadScene,
     TitleScene,
-    WaitingScene
+    WaitingScene,
+    GameScene
   ]
 };
 

@@ -1,4 +1,5 @@
-const ManagementService = require("../../domain/managementService");
+const ManagementService = require("../../domain/ManagementService");
+const GameService = require("../../domain/GameService");
 
 class MainEngine {
   #io;
@@ -18,14 +19,26 @@ class MainEngine {
     this.#io.on("connection", (socket) => {
       stateScope.#managementService.connect(socket);
 
+      //title scene events
       socket.on("identify", (data) => stateScope.#managementService.identify(socket.id, data));
       socket.on("games", (data) => stateScope.#managementService.games(socket.id, data));
-      socket.on("players", (data) => stateScope.#managementService.players(socket.id, data));
       socket.on("host", (data) => stateScope.#managementService.host(socket.id, data));
       socket.on("join", (data) => stateScope.#managementService.join(socket.id, data));
+      //waiting scene events
+      socket.on("players", (data) => stateScope.#managementService.players(socket.id, data));
       socket.on("add bot", (data) => stateScope.#managementService.addBot(socket.id, data));
       socket.on("remove bot", (data) => stateScope.#managementService.removeBot(socket.id, data));
       socket.on("leave", (data) => stateScope.#managementService.leave(socket.id, data));
+      socket.on("start", (data) => {
+        const startedGame = stateScope.#managementService.start(socket.id, data);
+        if (typeof startedGame != "undefined") {
+          var gameService = new GameService(startedGame, this.#logger);
+          gameService.start();
+        }
+      });
+      //game scene events
+
+      //common events
       socket.on("disconnect", (data) =>  stateScope.#managementService.disconnect(socket.id, data));
     });
   }

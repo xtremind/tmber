@@ -11,7 +11,7 @@ class GameScene extends Scene {
       console.log("GameScene.create");
       this.#createBoard()
       this.#addListener()
-      //this.scene.start('PreloadScene');
+      this.sys.game.socket.emit('ready');
     }
   
     #createBoard(){

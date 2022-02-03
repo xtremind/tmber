@@ -53,6 +53,21 @@ class Game {
     return this.#host.uuid() === player.uuid();
   }
 
+  isWaitingPlayer(){
+    return this.#status === State.WAITING && this.#players.length < 8
+  }
+
+  isReadyToStart(){
+    return this.#status === State.WAITING && this.#players.length <= 8 && this.#players.length > 2
+  }
+
+  start(){
+    this.#status = State.RUNNING;
+  }
+
+  end(){
+    this.#status = State.END;
+  }
 }
 
 module.exports = Game;
