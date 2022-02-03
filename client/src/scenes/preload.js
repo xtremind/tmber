@@ -11,7 +11,7 @@ class PreloadScene extends Scene {
     init() { }
   
     preload() {
-      console.log("PreloadScene - preload");
+      console.log("PreloadScene.preload");
 
       const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
       const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
@@ -28,7 +28,7 @@ class PreloadScene extends Scene {
       
       // Register a load progress event to show a load bar
       this.load.on('progress', (value) => {
-        console.log("PreloadScene - progress : " + parseInt(value*100)+'%');
+        console.log("PreloadScene.preload - progress : " + parseInt(value*100)+'%');
         progressPercent.setText(parseInt(value*100)+'%')
         progressBar.clear();
         progressBar.fillStyle(0xffffff, 1);
@@ -42,7 +42,7 @@ class PreloadScene extends Scene {
 
       // Register a complete event to launch the title screen when all files are loaded
       this.load.on('complete', () => {
-        console.log("PreloadScene - complete");
+        console.log("PreloadScene.preload - complete");
         loadingLabel.destroy();
         progressFile.destroy();
         progressPercent.destroy();

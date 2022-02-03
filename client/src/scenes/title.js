@@ -16,8 +16,16 @@ class TitleScene extends Scene {
 
   create() {
     console.log("TitleScene.create");
-    const sceneScope = this;
+    this.#createBoard();
+    this.#addListener();
+    this.sys.game.socket.emit('games', {});    
+    this.#redirectToGame()
+  }
 
+
+  #createBoard(){
+    console.log("TitleScene.#createBoard");
+    const sceneScope = this;
     //add background image
     sceneScope.add.image(0, 0, "cardTable").setOrigin(0);
 
@@ -28,6 +36,22 @@ class TitleScene extends Scene {
       .text(screenCenterX, 100, "♥ ♣  Tmber  ♠ ♦", Styles.titleText)
       .setOrigin(0.5);
 
+    sceneScope.#displayNameField()
+
+
+    //add rounded buttons
+    Graphics.drawButton(sceneScope,
+      {x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,width: 200,},
+      Styles.hostButton, "host game", Styles.hostText, "host game",
+      () => {
+        sceneScope.sys.game.socket.emit("host", {name: document.getElementById("nameField").value,});
+      }
+    );
+  }
+
+  #displayNameField(){
+    console.log("TitleScene.#displayNameField");
+    var sceneScope = this;
     let cookie = Cookies.get("tmber");
     let id, name;
 
@@ -44,7 +68,11 @@ class TitleScene extends Scene {
     sceneScope.sys.game.currentUuid = id;
 
     sceneScope.#addNameField(id, name);
+  }
 
+  #addListener(){
+    console.log("TitleScene.#addListener");
+    var sceneScope = this;
     //add listeners
     sceneScope.sys.game.socket.on("joined", (party) => {
       sceneScope.#gameJoined(party);
@@ -55,47 +83,38 @@ class TitleScene extends Scene {
     });
 
     sceneScope.sys.game.socket.on("games", (parties) => {
-      // delete current join List            
-      for (var key in sceneScope.gameList) {
-        Graphics.del(sceneScope.gameList[key]);
-      }
-
-      sceneScope.gameList = [];
+      sceneScope.#clearGames()
       var position = 0;
 
       // create new join List
       parties.forEach((party) => {
-        sceneScope.gameList[party.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX+ 50, y: 210 + 70 * ++position, height: 50, width: 200 }, Styles.joinButton, 'join game', Styles.joinText, 'join game', 
-        () => {
-          //sceneScope.sys.game.playerName = playerName.value;
-          console.log("join game " + party.id);
-          sceneScope.sys.game.socket.emit('join', { id: party.id, name: document.getElementById("nameField").value });
-        });
+        sceneScope.#showGame(party, ++position)
       });
     });
-
-    //add rounded buttons
-    Graphics.drawButton(sceneScope,
-      {x: sceneScope.cameras.main.width * 0.5 - 200, y: 280, height: 50,width: 200,},
-      Styles.hostButton, "host game", Styles.hostText, "host game",
-      () => {
-        sceneScope.sys.game.socket.emit("host", {name: document.getElementById("nameField").value,});
-      }
-    );
-
-    //ask waiting games
-    sceneScope.sys.game.socket.emit('games', {});
-    
-    //detect if join game
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if(urlParams.has('g') && !this.sys.game.leaving){
-      sceneScope.#goToGame(urlParams);
+  }
+  
+  #clearGames(){
+    console.log("TitleScene.#clearGames");
+    for (var key in this.gameList) {
+      Graphics.del(this.gameList[key]);
     }
+
+    this.gameList = [];
+  }
+  
+  #showGame(party, position){
+    console.log("TitleScene.#showGame - " + party.id);
+    var sceneScope = this;
+    sceneScope.gameList[party.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX+ 50, y: 210 + 70 * position, height: 50, width: 200 }, Styles.joinButton, 'join game', Styles.joinText, 'join game', 
+    () => {
+      //sceneScope.sys.game.playerName = playerName.value;
+      console.log("TitleScene.#showGame - join game " + party.id);
+      sceneScope.sys.game.socket.emit('join', { id: party.id, name: document.getElementById("nameField").value });
+    });
   }
 
   #gameJoined(party) {
-    console.log("game joined " + party.id);
+    console.log("TitleScene.#gameJoined - game joined " + party.id);
     this.sys.game.socket.off("games");
     this.sys.game.socket.off("joined");
     this.sys.game.socket.off("error");
@@ -117,7 +136,7 @@ class TitleScene extends Scene {
     element.addListener("input");
 
     element.on("input", () => {
-      console.log("TitleScene.create - input : " + document.getElementById("nameField").value);
+      console.log("TitleScene.#addNameFiel - input : " + document.getElementById("nameField").value);
       Cookies.set("tmber", JSON.stringify({ id, name: document.getElementById("nameField").value })
       );
     });
@@ -125,13 +144,13 @@ class TitleScene extends Scene {
 
   #goToGame(urlParams){
     var id = urlParams.get('g');
-    console.log("join game " + id);
+    console.log("TitleScene.#goToGame - join game " + id);
     this.sys.game.leaving = true;
     this.sys.game.socket.emit('join', { id: id, name: document.getElementById("nameField").value });
   }
 
   #showError(message){
-    console.log("error " + message);
+    console.log("TitleScene.#showError - error " + message);
     var errorMessage = this.add.text(this.cameras.main.worldView.x + this.cameras.main.width / 2, 50, message, { font: '32px Courier bold', fill: '#FF5733' });
     errorMessage.setOrigin(0.5);
     errorMessage.setAlpha(0);
@@ -153,7 +172,16 @@ class TitleScene extends Scene {
         });
         }
     });
+  }
 
+  #redirectToGame(){
+    console.log("TitleScene.#redirectToGame");
+    //detect if join game
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if(urlParams.has('g') && !this.sys.game.leaving){
+      this.#goToGame(urlParams);
+    }
   }
 
 }

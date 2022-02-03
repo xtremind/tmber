@@ -14,96 +14,37 @@ class WaitingScene extends Scene {
 
   create() {
     console.log("WaitingScene.create");
-    const sceneScope = this;
+    this.#createBoard();
+    this.#addListeners()
+
+    //ask players in game
+    this.sys.game.socket.emit('players', { id: this.sys.game.currentGameId });
+  }
+
+  #createBoard(){
+    console.log("WaitingScene.#createBoard");
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
 
     //add background image
-    sceneScope.add.image(0, 0, "cardTable").setOrigin(0);
+    this.add.image(0, 0, "cardTable").setOrigin(0);
     
     //add title
-    const screenCenterX =
-      sceneScope.cameras.main.worldView.x + sceneScope.cameras.main.width / 2;
-    sceneScope.add
+    this.add
       .text(screenCenterX, 100, "♥ ♣  Tmber  ♠ ♦", Styles.titleText)
       .setOrigin(0.5);
 
     // add a subtitle
-    sceneScope.add
-      .text(screenCenterX, 200, sceneScope.sys.game.currentHostname + '\'s Game', Styles.subtitleText)
+    this.add
+      .text(screenCenterX, 200, this.sys.game.currentHostname + '\'s Game', Styles.subtitleText)
       .setOrigin(0.5);
       
-    // add link to game
-    sceneScope.#addLinkToGame();
+    this.#addLinkToGame();
+    this.#addLeaveButton()
 
-    //add interactive button
-    Graphics.drawButton(sceneScope,
-      {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
-      Styles.hostButton, "leave game", Styles.hostText, "leave game",
-      () => {
-        console.log("player leave party");
-        sceneScope.sys.game.socket.emit("leave", {id: sceneScope.sys.game.currentGameId,});
-        sceneScope.#goToTitle();
-      }
-    );
-
-    //add listeners
-    sceneScope.sys.game.socket.on("players", function (data) {
-      console.log("refresh list of players in the game");
-      // delete current List            
-      for (var key in sceneScope.playersList) {
-        sceneScope.playersList[key].destroy();
-      }
-      sceneScope.playersList = [];
-
-      for(var key in sceneScope.botsList) {
-        sceneScope.botsList[key].destroy();
-      }      
-      sceneScope.botsList = [];
-
-      var position = 0;
-
-      // create new join List
-      data.forEach(function (player) {
-        sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 50 * position, player.name, Styles.playerNameText)
-        if(sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid && !player.isPlayer){
-          sceneScope.botsList[player.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX + 300, y: 230 + 50 * position, height: 40, width: 200 }, Styles.startButton, 'Remove', Styles.startText, 'Remove', function () {
-            console.log("remove bot");
-            sceneScope.sys.game.socket.emit('remove bot', { id: player.id });
-          });
-        }
-        position++;
-      });
-
-      sceneScope.#addBotButton(data.length)
-
-    })
-
-    sceneScope.sys.game.socket.on("leave", function (data) {
-      console.log("host player leave party");
-      sceneScope.#goToTitle();
-    });
-
-    //ask players in game
-    sceneScope.sys.game.socket.emit('players', { id: sceneScope.sys.game.currentGameId });
-  }
-
-  #addBotButton(nbPlayers){
-    const sceneScope = this;
-    // if hoster : button add Bot if less than 8 players
-    if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
-      if (typeof sceneScope.addBotButton == "undefined" && nbPlayers < 8 ){
-        sceneScope.addBotButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
-          console.log("add bot");
-          sceneScope.sys.game.socket.emit('add bot', { id: sceneScope.sys.game.currentGameId });
-        });
-      }
-      if (typeof sceneScope.addBotButton != "undefined" && nbPlayers >= 8){
-        sceneScope.addBotButton.destroy()
-        sceneScope.addBotButton = undefined;
-      }
-    }
   }
 
   #addLinkToGame(){
+    console.log("WaitingScene.#addLinkToGame");
     var div = document.createElement("div");
     var gameField = document.createElement("input");
     gameField.type="text"
@@ -126,10 +67,96 @@ class WaitingScene extends Scene {
 
     element.on("click", (event) => {
       if (event.target.id === 'copyButton'){
-        console.log("WaitingScene.#addLinkToGame + copyButton" + document.getElementById("gameField").value);
+        console.log("WaitingScene.#addLinkToGame - copyButton " + document.getElementById("gameField").value);
         navigator.clipboard.writeText(document.getElementById("gameField").value)
       }
     });
+  }
+
+  #addLeaveButton(){
+    console.log("WaitingScene.#addLeaveButton");
+    const sceneScope = this;
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    Graphics.drawButton(sceneScope,
+      {x: screenCenterX - 200, y: 280, height: 50,width: 200,},
+      Styles.hostButton, "leave game", Styles.hostText, "leave game",
+      () => {
+        console.log("WaitingScene.create - player leave party");
+        sceneScope.sys.game.socket.emit("leave", {id: sceneScope.sys.game.currentGameId,});
+        sceneScope.#goToTitle();
+      }
+    );
+  }
+
+  #addListeners(){
+    console.log("WaitingScene.#addListener");
+    const sceneScope = this;
+    //add listeners
+    sceneScope.sys.game.socket.on("players", function (data) {
+      console.log("WaitingScene.create - refresh list of players in the game");
+      sceneScope.#cleanPlayers()
+      sceneScope.#cleanBots();
+      var position = 0;
+
+      // create new join List
+      data.forEach(function (player) {
+        sceneScope.#showPlayer(player, position++);
+      });
+
+      sceneScope.#addBotButton(data.length)
+
+    })
+
+    sceneScope.sys.game.socket.on("leave", function (data) {
+      console.log("WaitingScene.create - host player leave party");
+      sceneScope.#goToTitle();
+    });
+  }
+
+  #showPlayer(player, position){
+    console.log("WaitingScene.#showPlayer - "+ player.id);
+    const sceneScope = this;
+    sceneScope.playersList[player.id] = sceneScope.add.text(sceneScope.cameras.main.centerX + 100, 235 + 50 * position, player.name, Styles.playerNameText)
+    if(sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid && !player.isPlayer){
+      sceneScope.botsList[player.id] = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX + 300, y: 230 + 50 * position, height: 40, width: 200 }, Styles.startButton, 'Remove', Styles.startText, 'Remove', function () {
+        console.log("WaitingScene.create - remove bot");
+        sceneScope.sys.game.socket.emit('remove bot', { id: player.id });
+      });
+    }
+  }
+
+  #cleanPlayers(){
+    console.log("WaitingScene.#cleanPlayers");
+    for (var key in this.playersList) {
+      this.playersList[key].destroy();
+    }
+    this.playersList = [];
+  }
+
+  #cleanBots(){
+    console.log("WaitingScene.#cleanBots");
+    for(var key in this.botsList) {
+      this.botsList[key].destroy();
+    }      
+    this.botsList = [];
+  }
+
+  #addBotButton(nbPlayers){
+    console.log("WaitingScene.#addBotButton");
+    const sceneScope = this;
+    // if hoster : button add Bot if less than 8 players
+    if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
+      if (typeof sceneScope.addBotButton == "undefined" && nbPlayers < 8 ){
+        sceneScope.addBotButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
+          console.log("WaitingScene.create - add bot");
+          sceneScope.sys.game.socket.emit('add bot', { id: sceneScope.sys.game.currentGameId });
+        });
+      }
+      if (typeof sceneScope.addBotButton != "undefined" && nbPlayers >= 8){
+        sceneScope.addBotButton.destroy()
+        sceneScope.addBotButton = undefined;
+      }
+    }
   }
 
   #goToTitle(){
