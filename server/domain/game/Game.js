@@ -43,6 +43,11 @@ class Game {
 
   replace(outgoingUser, incomingUser){
     //change player by bot, or bot by player if uuid are the same
+    //this.#players[this.#players.map((x, i) => [i, x]).filter(x => x[1].uuid() ==  outgoingUser.uuid())[0][0]] = incomingUser
+    var index = this.#players.indexOf(outgoingUser);
+    if (index !== -1) {
+      this.#players[index] = incomingUser;
+    } 
   }
 
   status(){

@@ -170,25 +170,21 @@ class ManagementService {
 
   #leaveGame(playerId, player, game){
     this.#logger.debug("["+playerId+"] leave game");
-    if(game.isHostedBy(player)){
-      this.#leaveGameAsHost(playerId, player, game)
-    } else {
-      this.#leaveGameAsPlayer(playerId, player, game)
+    if(game.status() == State.WAITING) {
+      if(game.isHostedBy(player)){
+        this.#leaveGameAsHost(playerId, player, game)
+      } else {
+        this.#leaveGameAsPlayer(playerId, player, game)
+      }
+    } else if(game.status() == State.RUNNING) {
+      var bot = new Bot();
+      
+      bot.setUuid(player.uuid()); 
+      bot.goInGame(game.id());
+      this.#players.set(playerId, bot);
+      
+      game.replace(player, bot);
     }
-    //if game is waiting
-      // if hosted
-        // aks other to leave
-        // remove player from game
-        // update list players
-        // remove players from room
-        // delete game
-        // update list games
-      //else 
-        // remove player from game
-        // update list players
-        // remove player from room
-    //else if game is running
-      // replace player by bot
   }
 
   #leaveGameAsHost(playerId, player, game){
