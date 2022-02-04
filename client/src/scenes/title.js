@@ -64,7 +64,7 @@ class TitleScene extends Scene {
       name = JSON.parse(cookie).name;
     }
 
-    sceneScope.sys.game.socket.emit("identify", { uuid: id });
+    sceneScope.sys.game.socket.emit("identify", { uuid: id, name});
     sceneScope.sys.game.currentUuid = id;
 
     sceneScope.#addNameField(id, name);
@@ -91,6 +91,11 @@ class TitleScene extends Scene {
         sceneScope.#showGame(party, ++position)
       });
     });
+
+    sceneScope.sys.game.socket.on("ready?", function (data) {
+      console.log("TitleScene.create - host player leave party");
+      sceneScope.#goToGame(data);
+    });
   }
   
   #clearGames(){
@@ -115,15 +120,29 @@ class TitleScene extends Scene {
 
   #gameJoined(party) {
     console.log("TitleScene.#gameJoined - game joined " + party.id);
-    this.sys.game.socket.off("games");
-    this.sys.game.socket.off("joined");
-    this.sys.game.socket.off("error");
+    this.#removeListeners();
     this.sys.game.currentGameId = party.id;
     this.sys.game.currentHostname = party.hostname;
-    this.gameList = [];
     this.scene.start('WaitingScene'); 
   }
 
+  
+  #goToGame(party) {
+    console.log("TitleScene.#goToGame - game rejoin " + party.id);
+    this.#removeListeners();
+    this.sys.game.currentGameId = party.id;
+    this.sys.game.currentHostname = party.hostname;
+    this.scene.start('GameScene');
+  }
+
+  #removeListeners(){
+    this.sys.game.socket.off("games");
+    this.sys.game.socket.off("joined");
+    this.sys.game.socket.off("error");
+    this.sys.game.socket.off("ready?");
+    this.gameList = [];
+  }
+  
   #addNameField(id, name){
     var inputText = document.createElement("input");
     inputText.placeholder = "Enter your name";
@@ -142,7 +161,7 @@ class TitleScene extends Scene {
     });
   }
 
-  #goToGame(urlParams){
+  #joinGame(urlParams){
     var id = urlParams.get('g');
     console.log("TitleScene.#goToGame - join game " + id);
     this.sys.game.leaving = true;
@@ -180,7 +199,7 @@ class TitleScene extends Scene {
     const urlParams = new URLSearchParams(window.location.search);
 
     if(urlParams.has('g') && !this.sys.game.leaving){
-      this.#goToGame(urlParams);
+      this.#joinGame(urlParams);
     }
   }
 

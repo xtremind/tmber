@@ -23,6 +23,37 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] identified", data);
     var currentPlayer = this.#players.get(playerId);
     currentPlayer.setUuid(data.uuid);
+    currentPlayer.setName(data.name);
+
+    var bot = this.#players.get(currentPlayer.uuid());
+    if (typeof bot !== "undefined"  && !bot.isPlayer()){
+      var currentGame = this.#games.get(bot.inGame());
+      
+      if (typeof currentGame !== "undefined" && currentGame.status() == State.RUNNING) {
+        currentGame.replace(bot, currentPlayer);
+        currentPlayer.goInGame(bot.inGame());
+        this.#players.delete(bot.uuid());
+        currentPlayer.socket().emit('ready?', {"id": currentGame.id(), "hostname": currentGame.hostname()});
+        this.#logger.debug("["+playerId+"] rejoin a running game", data);
+      }
+    } else {
+      this.#logger.debug("["+playerId+"] no known game for this player", data);
+    }
+
+    //if there's a bot this the same id in a game
+      // replace the bot by the player
+      // the emit start
+      /*
+      else if(game.status() == State.RUNNING) {
+      var bot = new Bot();
+      
+      bot.setUuid(player.uuid());
+      bot.goInGame(game.id());
+      this.#players.set(playerId, bot);
+      
+      game.replace(player, bot);
+    }
+      */
   }
 
   games(playerId, data) {
@@ -62,23 +93,24 @@ class ManagementService {
     //join a game
     var currentGame = this.#games.get(data.id);
     
-    if (typeof currentGame !== "undefined") {
-      if(currentGame.players().length > 8 ){
-        currentPlayer.socket().emit("error", { message: "too many player in game" });
-      }
-      currentGame.add(currentPlayer);
-      currentPlayer.goInGame(currentGame.id());
-      //join game
-      currentPlayer.socket().emit("joined", { id: currentGame.id() , "hostname": currentGame.hostname() });
-      // join a room to only communicate in
-      currentPlayer.socket().join(currentGame.id());
-      //update list player for joined game
-      currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
-      if(currentGame.players().length >= 8 ){
-        currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
-      }
+    if (typeof currentGame !== "undefined" && currentGame.status() == State.WAITING) {
+        if(currentGame.players().length > 8 ){
+          currentPlayer.socket().emit("error", { message: "too many player in game" });
+        }
+        currentGame.add(currentPlayer);
+        currentPlayer.goInGame(currentGame.id());
+        //join game
+        currentPlayer.socket().emit("joined", { id: currentGame.id() , "hostname": currentGame.hostname() });
+        // join a room to only communicate in
+        currentPlayer.socket().join(currentGame.id());
+        //update list player for joined game
+        currentPlayer.socket().to(currentGame.id()).emit("players", currentGame.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
+        if(currentGame.players().length >= 8 ){
+          currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((game) => {return {"id": game.id(), "hostname": game.hostname()}}));
+        }
+        this.#logger.debug("["+playerId+"] gamed joined", data);
     } else {
-      currentPlayer.socket().emit("error", { message: "unknown game" });
+      currentPlayer.socket().emit("error", { message: "not joinable game" });
     }
   }
 
@@ -179,9 +211,10 @@ class ManagementService {
     } else if(game.status() == State.RUNNING) {
       var bot = new Bot();
       
-      bot.setUuid(player.uuid()); 
+      bot.setUuid(player.uuid());
       bot.goInGame(game.id());
-      this.#players.set(playerId, bot);
+      this.#players.set(bot.uuid(), bot);
+      this.#players.delete(playerId);
       
       game.replace(player, bot);
     }
