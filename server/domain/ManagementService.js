@@ -141,7 +141,7 @@ class ManagementService {
     
     currentBot.leaveGame();
     if (typeof currentGame !== "undefined") {
-      this.#leaveGameAsBot(playerId, currentBot, currentGame);
+      this.#leaveWaitingGameAsBot(playerId, currentBot, currentGame);
       this.#logger.debug("["+currentBot.uuid()+"] removed from game");
     } else {
       this.#logger.debug("["+currentBot.uuid()+"] removed");
@@ -204,23 +204,16 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] leave game");
     if(game.status() == State.WAITING) {
       if(game.isHostedBy(player)){
-        this.#leaveGameAsHost(playerId, player, game)
+        this.#leaveWaitingGameAsHost(playerId, player, game);
       } else {
-        this.#leaveGameAsPlayer(playerId, player, game)
+        this.#leaveWaitingGameAsPlayer(playerId, player, game);
       }
     } else if(game.status() == State.RUNNING) {
-      var bot = new Bot();
-      
-      bot.setUuid(player.uuid());
-      bot.goInGame(game.id());
-      this.#players.set(bot.uuid(), bot);
-      this.#players.delete(playerId);
-      
-      game.replace(player, bot);
+      this.#leaveRunningGame(playerId, player, game);
     }
   }
 
-  #leaveGameAsHost(playerId, player, game){
+  #leaveWaitingGameAsHost(playerId, player, game){
     this.#logger.debug("["+playerId+"] leave game as host");
     // all should leave
     player.socket().to(game.id()).emit("leave");
@@ -231,7 +224,7 @@ class ManagementService {
     player.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id()}}));
   }
 
-  #leaveGameAsPlayer(playerId, player, game){
+  #leaveWaitingGameAsPlayer(playerId, player, game){
     this.#logger.debug("["+playerId+"] leave game as player");
     game.remove(player);
     //update list player for leaving game 
@@ -243,13 +236,38 @@ class ManagementService {
     }
   }
 
-  #leaveGameAsBot(playerId, bot, game){
+  #leaveWaitingGameAsBot(playerId, bot, game){
     this.#logger.debug("["+playerId+"] leave game as player");
     game.remove(bot);
     game.socket().to(game.id()).emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
     game.socket().emit("players", game.players().map((player) => {return {"id": player.uuid(), "name": player.name(), "isPlayer": player.isPlayer()}}));
     if(game.players().length < 8 ){
       game.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id(), "hostname": g.hostname()}}));
+    }
+  }
+
+  #leaveRunningGame(playerId, player, game){
+    this.#logger.debug("["+playerId+"] leave running game");
+    var nbPlayers = game.players().filter(p => p.isPlayer()).length;
+    if(nbPlayers > 1){
+      this.#logger.debug("["+playerId+"] leave running game that still has players");
+      //if there's more than 1 player, we replace the leaving player by a bot
+      var bot = new Bot();
+      
+      bot.setUuid(player.uuid());
+      bot.goInGame(game.id());
+      this.#players.set(bot.uuid(), bot);
+      this.#players.delete(playerId);
+      
+      game.replace(player, bot);
+    } else {
+      this.#logger.debug("["+playerId+"] leave running game that has no players");
+      // else, we stop the game
+      game.end();
+      //remove all bot in players
+      game.players().forEach(p => (p.isPlayer() && this.#players.delete(p.socket().id)) || (!p.isPlayer() && this.#players.delete(p.uuid())));
+      //remove game
+      this.#games.delete(game.id());
     }
   }
 

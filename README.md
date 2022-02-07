@@ -38,6 +38,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] start game
 - [x] disconnect a known player inside a running game by replacing by a bot
 - [x] reconnect a known player to a running game
+- [x] end game when last player disconnect
 
 ## IN PROGRESS
 
@@ -46,7 +47,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] end game when last player disconnect
 - [ ] don't allow a unknown player to join a running game
 - [ ] TU for service on server side
 
