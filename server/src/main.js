@@ -10,7 +10,7 @@ const MainEngine = require('./application/engine/MainEngine');
 
 // Configuration
 const port = process.env.PORT || 3000;
-const DIST_DIR = path.join(__dirname, '../dist');
+const DIST_DIR = path.join(__dirname, '../../dist');
 
 // Allow Auto Reload on change on client side
 const liveReloadServer = livereload.createServer();

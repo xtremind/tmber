@@ -6,12 +6,12 @@
   "scripts": {
     "watch": "rm -Rf dist && concurrently -p \"name\" -n \"server,client\" -c \"red,blue\" \"npm run watch:server\" \"npm run watch:client\"",
     "watch:client": "webpack --watch --mode development",
-    "watch:server": "nodemon --inspect server/main.js --watch \"./dist\" --watch \"./server\"",
+    "watch:server": "nodemon --inspect server/src/main.js --watch \"./dist\" --watch \"./server/src\"",
     "watch:client:only": "rm -Rf dist && concurrently -p \"name\" -n \"server,client\" -c \"red,blue\" \"npm run start\" \"npm run watch:client\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack --mode production",
-    "start": "node server/main.js",
-    "start-legacy": "if [$NODE_ENV == 'production']; then node server/main.js; else nodemon --inspect server/main.js --watch \"./dist\" --watch \"./server\"; fi"
+    "start": "node server/src/main.js",
+    "start-legacy": "if [$NODE_ENV == 'production']; then node server/src/main.js; else nodemon --inspect server/src/main.js --watch \"./dist\" --watch \"./server/src\"; fi"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "concurrently": "^7.0.0",
     "connect-livereload": "^0.6.1",
     "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.0",
     "livereload": "^0.9.3",
     "nodemon": "^2.0.15",
     "webpack": "^5.67.0",

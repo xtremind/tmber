@@ -40,20 +40,6 @@ class ManagementService {
       this.#logger.debug("["+playerId+"] no known game for this player", data);
     }
 
-    //if there's a bot this the same id in a game
-      // replace the bot by the player
-      // the emit start
-      /*
-      else if(game.status() == State.RUNNING) {
-      var bot = new Bot();
-      
-      bot.setUuid(player.uuid());
-      bot.goInGame(game.id());
-      this.#players.set(playerId, bot);
-      
-      game.replace(player, bot);
-    }
-      */
   }
 
   games(playerId, data) {

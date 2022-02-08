@@ -35,7 +35,9 @@ class GameService {
           stateScope.#logger.debug("["+stateScope.#game.id()+"] everybody is ready");
         }
       });
-
+      player.socket().addListener("test", () => {
+        stateScope.#logger.debug("["+stateScope.#game.id()+"]["+player.uuid()+"] test");
+      });
     });
   }
 
