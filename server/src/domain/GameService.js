@@ -10,7 +10,11 @@ class GameService {
 
   #startingPlayer = 0;
   #currentPlayer = 0;
-  #deck = []
+
+  #deck = []                // draw pile
+  #discard = [];            // discarded pile (last played card)
+  #givenCards = new Map();  // players' hands
+  #scores = new Map();      // global score
 
   constructor(game, logger) {
     this.#logger = logger;
@@ -28,7 +32,8 @@ class GameService {
   #initiate(){
     this.#logger.debug("["+this.#game.id()+"] initiating...");
 
-    this.#randomizeDeck()
+    this.#randomizeDeck();
+    this.#initiateScore();
 
     this.#logger.debug("["+this.#game.id()+"] initiated");
   }
@@ -37,6 +42,11 @@ class GameService {
     this.#logger.debug("["+this.#game.id()+"] randomizeDeck");
     this.#deck = cards.slice();
     this.#deck.sort(function () { return 0.5 - Math.random() });
+  }
+
+  #initiateScore(){
+    this.#logger.debug("["+this.#game.id()+"] initiateScore");
+    this.#game.players().forEach(p => this.#scores.set(p.uuid(), {uuid : p.uuid(), name: p.name(), score: 0}))
   }
 
   #setEventHandlers(){

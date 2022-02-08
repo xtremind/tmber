@@ -46,6 +46,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] adding cards atlas
 - [x] initialize deck
 - [x] randomize deck
+- [x] initiate score
 
 ## IN PROGRESS
 
@@ -57,17 +58,24 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 ## TODO
 
 - [ ] dealing cards (5 cards per player)
+
 - [ ] pick a card from the draw pile
 - [ ] pick a card from the discard pile
 - [ ] validate picked card
+  
 - [ ] discard 1 or more cards
 - [ ] validate discarded cards
+
 - [ ] next player
+
 - [ ] "timber"
 - [ ] validate timber (score < 7)
+
 - [ ] compute current score
 - [ ] display current score
+
 - [ ] compute global score
+
 - [ ] next play
 - [ ] define next starting player
 - [ ] end game (score > 100)
