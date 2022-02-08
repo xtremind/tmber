@@ -42,6 +42,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] don't allow a unknown player to join a running game
 - [x] git tag => template for multiplayer
 - [x] define starting player
+- [x] define current player
 
 ## IN PROGRESS
 
@@ -52,7 +53,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] define current player
 - [ ] initialize deck
 - [ ] dealing cards (5 cards per player)
 - [ ] pick a card from the draw pile

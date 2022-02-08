@@ -6,6 +6,7 @@ class GameService {
   #playerReady = 0
 
   #startingPlayer = 0;
+  #currentPlayer = 0;
 
   constructor(game, logger) {
     this.#logger = logger;
