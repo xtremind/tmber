@@ -43,6 +43,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] git tag => template for multiplayer
 - [x] define starting player
 - [x] define current player
+- [x] adding cards atlas
 
 ## IN PROGRESS
 
@@ -54,6 +55,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 ## TODO
 
 - [ ] initialize deck
+- [ ] randomize deck
 - [ ] dealing cards (5 cards per player)
 - [ ] pick a card from the draw pile
 - [ ] pick a card from the discard pile

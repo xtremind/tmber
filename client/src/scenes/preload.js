@@ -1,5 +1,7 @@
 import {Scene} from 'phaser';
 import cardTable from 'images/cardTable.png';
+import cards from 'images/cards.png';
+import cardAtlas from 'jsons/cards.json';
 
 class PreloadScene extends Scene {
     constructor() {
@@ -53,6 +55,7 @@ class PreloadScene extends Scene {
   
       //Load all assets
       this.load.image('cardTable', cardTable);
+      this.load.atlas('cards', cards, cardAtlas);
       //this.load.audio('playCard', 'public/audio/playcard.wav');
     }
   }

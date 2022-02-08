@@ -33,6 +33,7 @@ module.exports = {
     alias: {
       images: path.resolve(__dirname, './client/src/assets/img'),
       sounds: path.resolve(__dirname, './client/src/assets/snd'),
+      jsons: path.resolve(__dirname, './client/src/assets/json'),
       scenes: path.resolve(__dirname, './client/src/scenes'),
       utils: path.resolve(__dirname, './client/src/utils'),
     }, 
