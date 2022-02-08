@@ -5,6 +5,8 @@ class GameService {
   #game;
   #playerReady = 0
 
+  #startingPlayer = 0;
+
   constructor(game, logger) {
     this.#logger = logger;
     this.#game = game;
@@ -12,14 +14,21 @@ class GameService {
 
   start(){
     this.#logger.debug("["+this.#game.id()+"] starting...");
-    //initiate all
+    this.#initiate();
     this.#setEventHandlers();
     this.#askReadiness()
     this.#logger.debug("["+this.#game.id()+"] started");
   }
 
+  #initiate(){
+    this.#logger.debug("["+this.#game.id()+"] initiating...");
+
+
+    this.#logger.debug("["+this.#game.id()+"] initiated");
+  }
+
   #setEventHandlers(){
-    this.#logger.debug("["+this.#game.id()+"] #setEventHandlers");
+    this.#logger.debug("["+this.#game.id()+"] setEventHandlers");
     var stateScope = this;
     this.#game.players().forEach(player => {
       if(!player.isPlayer()) {

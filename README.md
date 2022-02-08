@@ -40,19 +40,18 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] reconnect a known player to a running game
 - [x] end game when last player disconnect
 - [x] don't allow a unknown player to join a running game
+- [x] git tag => template for multiplayer
+- [x] define starting player
 
 ## IN PROGRESS
 
-- [ ] TU for service on server side
 
 ## BLOCKED
 
+- [ ] TU for service on server side => TODO : need to improve test with socket. maybe spy could work
+
 ## TODO
 
-
-- [ ] git tag => template for multiplayer
-
-- [ ] define starting player
 - [ ] define current player
 - [ ] initialize deck
 - [ ] dealing cards (5 cards per player)
