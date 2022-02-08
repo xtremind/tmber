@@ -1,4 +1,7 @@
 
+const {cards} = require('../infrastructure/cards/cards.json');
+
+
 class GameService {
 
   #logger;
@@ -7,6 +10,7 @@ class GameService {
 
   #startingPlayer = 0;
   #currentPlayer = 0;
+  #deck = []
 
   constructor(game, logger) {
     this.#logger = logger;
@@ -24,8 +28,15 @@ class GameService {
   #initiate(){
     this.#logger.debug("["+this.#game.id()+"] initiating...");
 
+    this.#randomizeDeck()
 
     this.#logger.debug("["+this.#game.id()+"] initiated");
+  }
+  
+  #randomizeDeck() {
+    this.#logger.debug("["+this.#game.id()+"] randomizeDeck");
+    this.#deck = cards.slice();
+    this.#deck.sort(function () { return 0.5 - Math.random() });
   }
 
   #setEventHandlers(){

@@ -44,6 +44,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] define starting player
 - [x] define current player
 - [x] adding cards atlas
+- [x] initialize deck
+- [x] randomize deck
 
 ## IN PROGRESS
 
@@ -54,8 +56,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] initialize deck
-- [ ] randomize deck
 - [ ] dealing cards (5 cards per player)
 - [ ] pick a card from the draw pile
 - [ ] pick a card from the discard pile

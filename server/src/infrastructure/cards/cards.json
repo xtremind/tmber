@@ -1,0 +1,322 @@
+{
+  "cards": [
+    {
+      "filename": "clubs10",
+      "rank": 10,
+      "suit": "C",
+      "value": 10
+    },
+    {
+      "filename": "clubs2",
+      "rank": 2,
+      "suit": "C",
+      "value": 2
+    },
+    {
+      "filename": "clubs3",
+      "rank": 3,
+      "suit": "C",
+      "value": 3
+    },
+    {
+      "filename": "clubs4",
+      "rank": 4,
+      "suit": "C",
+      "value": 4
+    },
+    {
+      "filename": "clubs5",
+      "rank": 5,
+      "suit": "C",
+      "value": 5
+    },
+    {
+      "filename": "clubs6",
+      "rank": 6,
+      "suit": "C",
+      "value": 6
+    },
+    {
+      "filename": "clubs7",
+      "rank": 7,
+      "suit": "C",
+      "value": 7
+    },
+    {
+      "filename": "clubs8",
+      "rank": 8,
+      "suit": "C",
+      "value": 8
+    },
+    {
+      "filename": "clubs9",
+      "rank": 9,
+      "suit": "C",
+      "value": 9
+    },
+    {
+      "filename": "clubsAce",
+      "rank": 1,
+      "suit": "C",
+      "value": 1
+    },
+    {
+      "filename": "clubsJack",
+      "rank": 11,
+      "suit": "C",
+      "value": 10
+    },
+    {
+      "filename": "clubsKing",
+      "rank": 13,
+      "suit": "C",
+      "value": 10
+    },
+    {
+      "filename": "clubsQueen",
+      "rank": 12,
+      "suit": "C",
+      "value": 10
+    },
+    {
+      "filename": "diamonds10",
+      "rank": 10,
+      "suit": "D",
+      "value": 10
+    },
+    {
+      "filename": "diamonds2",
+      "rank": 2,
+      "suit": "D",
+      "value": 2
+    },
+    {
+      "filename": "diamonds3",
+      "rank": 3,
+      "suit": "D",
+      "value": 3
+    },
+    {
+      "filename": "diamonds4",
+      "rank": 4,
+      "suit": "D",
+      "value": 4
+    },
+    {
+      "filename": "diamonds5",
+      "rank": 5,
+      "suit": "D",
+      "value": 5
+    },
+    {
+      "filename": "diamonds6",
+      "rank": 6,
+      "suit": "D",
+      "value": 6
+    },
+    {
+      "filename": "diamonds7",
+      "rank": 7,
+      "suit": "D",
+      "value": 7
+    },
+    {
+      "filename": "diamonds8",
+      "rank": 8,
+      "suit": "D",
+      "value": 8
+    },
+    {
+      "filename": "diamonds9",
+      "rank": 9,
+      "suit": "D",
+      "value": 9
+    },
+    {
+      "filename": "diamondsAce",
+      "rank": 1,
+      "suit": "D",
+      "value": 1
+    },
+    {
+      "filename": "diamondsJack",
+      "rank": 11,
+      "suit": "D",
+      "value": 10
+    },
+    {
+      "filename": "diamondsKing",
+      "rank": 13,
+      "suit": "D",
+      "value": 10
+    },
+    {
+      "filename": "diamondsQueen",
+      "rank": 12,
+      "suit": "D",
+      "value": 10
+    },
+    {
+      "filename": "hearts10",
+      "rank": 10,
+      "suit": "H",
+      "value": 10
+    },
+    {
+      "filename": "hearts2",
+      "rank": 2,
+      "suit": "H",
+      "value": 2
+    },
+    {
+      "filename": "hearts3",
+      "rank": 3,
+      "suit": "H",
+      "value": 3
+    },
+    {
+      "filename": "hearts4",
+      "rank": 4,
+      "suit": "H",
+      "value": 4
+    },
+    {
+      "filename": "hearts5",
+      "rank": 5,
+      "suit": "H",
+      "value": 5
+    },
+    {
+      "filename": "hearts6",
+      "rank": 6,
+      "suit": "H",
+      "value": 6
+    },
+    {
+      "filename": "hearts7",
+      "rank": 7,
+      "suit": "H",
+      "value": 7
+    },
+    {
+      "filename": "hearts8",
+      "rank": 8,
+      "suit": "H",
+      "value": 8
+    },
+    {
+      "filename": "hearts9",
+      "rank": 9,
+      "suit": "H",
+      "value": 9
+    },
+    {
+      "filename": "heartsAce",
+      "rank": 1,
+      "suit": "H",
+      "value": 1
+    },
+    {
+      "filename": "heartsJack",
+      "rank": 11,
+      "suit": "H",
+      "value": 10
+    },
+    {
+      "filename": "heartsKing",
+      "rank": 13,
+      "suit": "H",
+      "value": 10
+    },
+    {
+      "filename": "heartsQueen",
+      "rank": 12,
+      "suit": "H",
+      "value": 10
+    },
+    {
+      "filename": "joker",
+      "rank": 0,
+      "suit": "",
+      "value": 0
+    },
+    {
+      "filename": "spades10",
+      "rank": 10,
+      "suit": "S",
+      "value": 10
+    },
+    {
+      "filename": "spades2",
+      "rank": 2,
+      "suit": "S",
+      "value": 2
+    },
+    {
+      "filename": "spades3",
+      "rank": 3,
+      "suit": "S",
+      "value": 3
+    },
+    {
+      "filename": "spades4",
+      "rank": 4,
+      "suit": "S",
+      "value": 4
+    },
+    {
+      "filename": "spades5",
+      "rank": 5,
+      "suit": "S",
+      "value": 5
+    },
+    {
+      "filename": "spades6",
+      "rank": 6,
+      "suit": "S",
+      "value": 6
+    },
+    {
+      "filename": "spades7",
+      "rank": 7,
+      "suit": "S",
+      "value": 7
+    },
+    {
+      "filename": "spades8",
+      "rank": 8,
+      "suit": "S",
+      "value": 8
+    },
+    {
+      "filename": "spades9",
+      "rank": 9,
+      "suit": "S",
+      "value": 9
+    },
+    {
+      "filename": "spadesAce",
+      "rank": 1,
+      "suit": "S",
+      "value": 1
+    },
+    {
+      "filename": "spadesJack",
+      "rank": 11,
+      "suit": "S",
+      "value": 10
+    },
+    {
+      "filename": "spadesKing",
+      "rank": 13,
+      "suit": "S",
+      "value": 10
+    },
+    {
+      "filename": "spadesQueen",
+      "rank": 12,
+      "suit": "S",
+      "value": 10
+    }
+  ]
+}
