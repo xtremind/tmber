@@ -10,7 +10,7 @@ class GameService {
   #playerReady = 0
 
   #startingPlayer;
-  #currentPlayer = 0;
+  #currentPlayer;
 
   #deck = []                // draw pile
   #discard = [];            // discarded pile (last played card)
@@ -53,17 +53,13 @@ class GameService {
         return;
       }
       //is ready
-      player.socket().addListener("ready", () => {
+      player.socket().on("ready", () => {
         stateScope.#logger.debug("["+stateScope.#game.id()+"]["+player.uuid()+"] ready");
         stateScope.#playerReady++;
         if (stateScope.#playerReady == stateScope.#game.players().length) {
           stateScope.#logger.debug("["+stateScope.#game.id()+"] everybody is ready - game start");
           stateScope.#startGame();
         }
-      });
-      //TODO : remove. for tests only
-      player.socket().addListener("test", () => {
-        stateScope.#logger.debug("["+stateScope.#game.id()+"]["+player.uuid()+"] test");
       });
     });
   }
@@ -78,6 +74,7 @@ class GameService {
     this.#nextPlay();
     this.#nextTurn();
     this.#showBoard();
+    this.#firstAction();
   }
   
   #nextPlay(){
@@ -148,13 +145,84 @@ class GameService {
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
   }
 
-  #turn(){
+  #drawACard(){
     let player = this.#game.players()[this.#currentPlayer];
-    if(player.isPlayer()){
-      player.socket().addListener("pick", (card) => {});
-      player.socket().addListener("tmber", (card) => {});
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] draw a card");
+    // draw a card
+    var card = this.#deck.slice(0, 1);
+    // add card into hand
+    let hand = this.#givenCards.get(player.uuid()).concat(card);
+    hand.sort((a, b) => a.value - b.value);
+    this.#givenCards.set(player.uuid(), hand);
+    // remove card from draw
+    this.#deck = this.#deck.slice(1, this.#deck.length);
+    // refresh cards
+    player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+    //
+    this.#forgetFirstActionListener();
+    // next step
+    this.#secondAction();
+  }
 
-      this.#game.players()[this.#currentPlayer].emit('pick?');
+  #pickACard(card){ 
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card");
+    // pickup a card
+    // add card into hand
+    // remove card from discard
+    // refresh cards
+    player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+    //
+    this.#forgetFirstActionListener();
+    // next step
+  }
+
+  #timber(){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] timber");
+        // receive timber
+          // validate timber
+          // compute play score
+          // show current play score
+          // if nobody has more than 100 point
+            // next play
+          // else 
+            // end game
+  }
+
+  #forgetFirstActionListener(){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget First Action Listener");
+    player.socket().removeAllListeners("pick")
+    player.socket().removeAllListeners("draw")
+    player.socket().removeAllListeners("tmber")
+  }
+
+  #firstAction(){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] first action");
+    var stateScope = this;
+    if(player.isPlayer()){
+      player.socket().on("pick", (card) => stateScope.#pickACard());
+      player.socket().on("draw", () => stateScope.#drawACard());
+      player.socket().on("tmber", () => stateScope.#pickACard());
+
+      player.socket().emit('pick?');
+    } else {
+      //bot
+    }
+  }
+
+  #secondAction(){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] second action");
+    var stateScope = this;
+    if(player.isPlayer()){
+    // ask current player to discard
+    // receive discarded cards
+    // validate discarded cards
+    // discarded to discard pile 
+    // next turn
     } else {
       //bot
     }

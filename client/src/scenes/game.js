@@ -4,12 +4,15 @@ import { Scene } from "phaser";
 // Internal Modules
 import Graphics from "utils/Graphics";
 import Styles from "utils/Styles";
+import Action from 'commons/Action'
+
 
 class GameScene extends Scene {
   
   #players = new Map();
   #hand = [];
   #discard = [];
+  #currentAction = Action.WAIT;
 
   #separateSpace = 35;
   #centerX;
@@ -62,7 +65,7 @@ class GameScene extends Scene {
     this.#discard.forEach((card, index) => {
       this.add.image(this.#centerX + 100 + this.#separateSpace * (index /* +1 */), this.#centerY - (card.selected ? 50 : 0), 'cards', card.name)
         .setInteractive()
-        .addListener('pointerdown',() => console.log("discard") )
+        .addListener('pointerdown',() => console.log("pick ", card) )
     });
 
     this.#showDraw()
@@ -70,13 +73,22 @@ class GameScene extends Scene {
 
   #showDraw(){
     console.log("GameScene.#showDraw");
+    var sceneScope = this;
     this.add.image(this.#centerX - 100, this.#centerY+8, 'cards', 'back')
     this.add.image(this.#centerX - 96, this.#centerY+4, 'cards', 'back')
     this.add.image(this.#centerX - 92, this.#centerY, 'cards', 'back')
     this.add.image(this.#centerX - 88, this.#centerY-4, 'cards', 'back')
     this.add.image(this.#centerX - 84, this.#centerY-8, 'cards', 'back')
       .setInteractive()
-      .addListener('pointerdown',() => console.log("draw") ) //=> only that one will have a listener
+      .addListener('pointerdown',() => {
+        if (sceneScope.#currentAction == Action.PICKUP){
+          console.log("draw"); 
+          sceneScope.#currentAction = Action.WAIT;
+          sceneScope.sys.game.socket.emit("draw");
+        } else {
+          console.log("bad action"); 
+        }
+      }) //=> only that one will have a listener
   }
 
   #showTimber(){
@@ -104,6 +116,11 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
+    sceneScope.sys.game.socket.on("pick?", () => {
+      sceneScope.#currentAction = Action.PICKUP;
+      sceneScope.#showDiscard()
+      sceneScope.#showDraw()
+    });
   }
 }
 

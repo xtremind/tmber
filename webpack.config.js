@@ -36,6 +36,7 @@ module.exports = {
       jsons: path.resolve(__dirname, './client/src/assets/json'),
       scenes: path.resolve(__dirname, './client/src/scenes'),
       utils: path.resolve(__dirname, './client/src/utils'),
+      commons: path.resolve(__dirname, './commons'),
     }, 
     extensions: ["*", ".js", ".jsx"] 
   }

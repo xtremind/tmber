@@ -50,9 +50,9 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] dealing cards (5 cards per player)
 - [x] show draw pile
 - [x] show discard pile
+- [x] pick a card from the draw pile
 
 ## IN PROGRESS
-
 
 ## BLOCKED
 
@@ -60,8 +60,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-
-- [ ] pick a card from the draw pile
 - [ ] pick a card from the discard pile
 - [ ] validate picked card
   

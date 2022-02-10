@@ -241,6 +241,12 @@
       "value": 0
     },
     {
+      "filename": "joker",
+      "rank": 0,
+      "suit": "",
+      "value": 0
+    },
+    {
       "filename": "spades10",
       "rank": 10,
       "suit": "S",
