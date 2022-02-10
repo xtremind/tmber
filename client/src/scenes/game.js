@@ -9,6 +9,11 @@ class GameScene extends Scene {
   
   #players = new Map();
   #hand = [];
+  #discard = [];
+
+  #separateSpace = 35;
+  #centerX;
+  #centerY;
 
   constructor() {
     super({
@@ -18,7 +23,8 @@ class GameScene extends Scene {
 
   create() {
     console.log("GameScene.create");
-    var sceneScope = this;
+    this.#centerX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    this.#centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
     this.#createBoard()
     this.#addListener()
     this.sys.game.socket.emit('ready');
@@ -33,31 +39,44 @@ class GameScene extends Scene {
   }
 
   #showScore(scores){
-    console.log("GameScene.#showScore - " + scores);
+    console.log("GameScene.#showScore", scores);
   }
 
   #showHand(cards){
-    console.log("GameScene.#showHand - " + cards);
+    console.log("GameScene.#showHand", cards);
     if (typeof cards !== "undefined") this.#hand = cards;
-
-    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-
-    const posX = screenCenterX - ((this.#hand.length - 1) * 50)/2
+    const posX = this.#centerX - ((this.#hand.length - 1) * this.#separateSpace)/2;
     this.#hand.forEach((card, index) => {
-      this.add.image(posX + 50 * (index /* +1 */), this.cameras.main.height - (card.selected ? 100 : 50), 'cards', card.name)
+      this.add.image(posX + this.#separateSpace * (index /* +1 */), this.cameras.main.height - (card.selected ? 100 : 50), 'cards', card.name)
     });
   }
 
   #showOthers(others){
-    console.log("GameScene.#showOthers - " + others);
+    console.log("GameScene.#showOthers", others);
   }
 
   #showDiscard(discard){
-    console.log("GameScene.#showDiscard - " + discard);
+    console.log("GameScene.#showDiscard", discard);
+    if (typeof discard !== "undefined") this.#discard = discard;
+    
+    this.#discard.forEach((card, index) => {
+      this.add.image(this.#centerX + 100 + this.#separateSpace * (index /* +1 */), this.#centerY - (card.selected ? 50 : 0), 'cards', card.name)
+        .setInteractive()
+        .addListener('pointerdown',() => console.log("discard") )
+    });
+
+    this.#showDraw()
   }
 
   #showDraw(){
     console.log("GameScene.#showDraw");
+    this.add.image(this.#centerX - 100, this.#centerY+8, 'cards', 'back')
+    this.add.image(this.#centerX - 96, this.#centerY+4, 'cards', 'back')
+    this.add.image(this.#centerX - 92, this.#centerY, 'cards', 'back')
+    this.add.image(this.#centerX - 88, this.#centerY-4, 'cards', 'back')
+    this.add.image(this.#centerX - 84, this.#centerY-8, 'cards', 'back')
+      .setInteractive()
+      .addListener('pointerdown',() => console.log("draw") ) //=> only that one will have a listener
   }
 
   #showTimber(){

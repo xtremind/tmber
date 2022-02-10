@@ -48,6 +48,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] randomize deck
 - [x] initiate score
 - [x] dealing cards (5 cards per player)
+- [x] show draw pile
+- [x] show discard pile
 
 ## IN PROGRESS
 

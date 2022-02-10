@@ -145,7 +145,7 @@ class GameService {
       }
     });
     
-    this.#broadcast('discard', this.#discard);
+    this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
   }
 
   #turn(){
