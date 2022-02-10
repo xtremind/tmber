@@ -32,7 +32,7 @@ class MainEngine {
       socket.on("start", (data) => {
         const startedGame = stateScope.#managementService.start(socket.id, data);
         if (typeof startedGame != "undefined") {
-          var gameService = new GameService(startedGame, this.#logger);
+          var gameService = new GameService(stateScope.#io, startedGame, this.#logger);
           gameService.start();
         }
       });

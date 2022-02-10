@@ -47,6 +47,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] initialize deck
 - [x] randomize deck
 - [x] initiate score
+- [x] dealing cards (5 cards per player)
 
 ## IN PROGRESS
 
@@ -57,14 +58,13 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] dealing cards (5 cards per player)
 
 - [ ] pick a card from the draw pile
 - [ ] pick a card from the discard pile
 - [ ] validate picked card
   
 - [ ] discard 1 or more cards
-- [ ] validate discarded cards
+- [ ] validate discarded cards (all from hand and one of : single, double, triple, quadruple, series of 3, series of 4, series of 5)
 
 - [ ] next player
 

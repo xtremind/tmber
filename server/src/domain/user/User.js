@@ -46,6 +46,8 @@ class User {
   leaveGame(){
     this.#inGame = undefined;
   }
+
+  //addListener, emit, broadcast, joinRoom, emitRoom
 }
 
 module.exports = User;
