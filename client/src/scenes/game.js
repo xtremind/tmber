@@ -12,6 +12,7 @@ class GameScene extends Scene {
   #players = new Map();
   #hand = [];
   #discard = [];
+  #others = [];
   #currentAction = Action.WAIT;
 
   #separateSpace = 35;
@@ -72,7 +73,7 @@ class GameScene extends Scene {
     //if at least 1 selected, display discard button
     if(this.#hand.some(card => card.selected) && sceneScope.#currentAction == Action.DISCARD){
       let discardButton = Graphics.drawButton(sceneScope,
-        {x: 200, y: 350, height: 50,width: 200,},
+        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
         Styles.hostButton, "discard", Styles.hostText, "discard",
         () => {
           console.log("GameScene.#showHand - discard");
@@ -90,8 +91,28 @@ class GameScene extends Scene {
   }
 
   #showOthers(others){
-    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showOthers", others);
+    if (typeof others !== "undefined") this.#others = others;
+    this.#destroyAll('others');
+
+    const nbOthers = this.#others.length;
+    const myIndex = this.#others.findIndex(el => el.uuid == this.sys.game.currentUuid);
+    const angle = ((360 / nbOthers) * Math.PI) / 180
+
+    for(let i = 0; i < nbOthers - 1; i++){
+      let other = this.#others[((i + 1 + myIndex) % nbOthers)]
+      let posX = this.#centerX - 500 * Math.sin(angle*(i+1));
+      let posY = this.#centerY + 300 * Math.cos(angle*(i+1));
+      
+      //display player's nb cards
+      for( let j = 0; j < other.nb; j++){
+        this.#add('others', this.add.image(posX + j * 10, posY - j * 10, 'cards', 'back'));
+      }
+
+      //display player's name
+      this.#add('others', this.add.text(posX, posY + 100, this.#players.get(other.uuid).name, Styles.playerNameText).setOrigin(0.5, 0));
+    }
+
   }
 
   #showDiscard(discard){
@@ -137,27 +158,33 @@ class GameScene extends Scene {
   }
 
   #showTimber(){
-    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showTimber");
-    
-    /*
-    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    this.#destroyAll('tmber');
 
-    sceneScope.startButton = Graphics.drawButton(sceneScope,
-      {x: screenCenterX - 200, y: 350, height: 50,width: 200,},
-      Styles.hostButton, "start game", Styles.hostText, "start game",
-      () => {
-        console.log("WaitingScene.#addStartButton - start game");
-        sceneScope.sys.game.socket.emit("test", {id: sceneScope.sys.game.currentGameId,});
-      }
-    );*/
+    if(sceneScope.#currentAction == Action.DISCARD){
+      let tmber = Graphics.drawButton(sceneScope,
+        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
+        Styles.hostButton, "tmber", Styles.hostText, "tmber",
+        () => {
+          console.log("GameScene.#showTimber");
+          /*if (sceneScope.#currentAction == Action.DISCARD){
+            sceneScope.#currentAction = Action.WAIT;
+            sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
+          } else {
+            console.log("bad action"); 
+          }*/
+        }
+      );
+      
+      this.#add('tmber', tmber);
+    }
   }
 
   #addListener(){
     console.log("GameScene.#addListener");
     var sceneScope = this;
     
-    sceneScope.sys.game.socket.on("players", players => players.forEach(player => sceneScope.#players.set(player.id, player)));
+    sceneScope.sys.game.socket.on("players", players => players.forEach(player => sceneScope.#players.set(player.uuid, player)));
     sceneScope.sys.game.socket.on("score", scores => sceneScope.#showScore(scores));
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));

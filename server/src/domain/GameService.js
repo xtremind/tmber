@@ -138,7 +138,7 @@ class GameService {
     this.#game.players().forEach(player => {
       if(player.isPlayer()) {
         player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-        player.socket().emit('others', [...this.#givenCards.keys()].filter(key => key != player.uuid()).map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
+        player.socket().emit('others', [...this.#givenCards.keys()]/*.filter(key => key != player.uuid())*/.map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
       }
     });
     
