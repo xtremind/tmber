@@ -49,13 +49,45 @@ class GameScene extends Scene {
   }
 
   #showHand(cards){
-    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showHand", cards);
+    var sceneScope = this;
     if (typeof cards !== "undefined") this.#hand = cards;
+    this.#destroyAll('hand');
     const posX = this.#centerX - ((this.#hand.length - 1) * this.#separateSpace)/2;
     this.#hand.forEach((card, index) => {
-      this.add.image(posX + this.#separateSpace * (index /* +1 */), this.cameras.main.height - (card.selected ? 100 : 50), 'cards', card.name)
+      let image = this.add.image(posX + this.#separateSpace * (index /* +1 */), this.cameras.main.height - (card.selected ? 100 : 50), 'cards', card.name);
+      
+      image.setInteractive();
+      image.addListener('pointerdown',() => {
+        if (sceneScope.#currentAction == Action.DISCARD){
+          console.log("select", card);
+          card.selected = (!card.selected);
+          sceneScope.#showHand();
+        } else {
+          console.log("bad action"); 
+        }
+      });
+      this.#add('hand', image);
     });
+    //if at least 1 selected, display discard button
+    if(this.#hand.some(card => card.selected) && sceneScope.#currentAction == Action.DISCARD){
+      let discardButton = Graphics.drawButton(sceneScope,
+        {x: 200, y: 350, height: 50,width: 200,},
+        Styles.hostButton, "discard", Styles.hostText, "discard",
+        () => {
+          console.log("GameScene.#showHand - discard");
+          if (sceneScope.#currentAction == Action.DISCARD){
+            sceneScope.#currentAction = Action.WAIT;
+            sceneScope.#showHand();
+            sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
+          } else {
+            console.log("bad action"); 
+          }
+        }
+      );
+      
+      this.#add('hand', discardButton);
+    }
   }
 
   #showOthers(others){
@@ -81,11 +113,8 @@ class GameScene extends Scene {
           console.log("bad action"); 
         }
       })
-      
-    this.#add('discard', image);
+      this.#add('discard', image);
     });
-
-    this.#showDraw()
   }
 
   #showDraw(){
@@ -135,6 +164,7 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
     sceneScope.sys.game.socket.on("pick?", () => sceneScope.#currentAction = Action.PICKUP);
+    sceneScope.sys.game.socket.on("discard?", () => sceneScope.#currentAction = Action.DISCARD);
   }
 
   #add(id, element){

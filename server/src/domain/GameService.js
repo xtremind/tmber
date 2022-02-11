@@ -225,16 +225,32 @@ class GameService {
     }
   }
 
+  #discardCards(cards){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] discard cards", cards);
+    // receive discarded cards
+    // validate discarded cards
+    // discarded to discard pile 
+    //
+    this.#forgetSecondActionListener();
+    // next turn
+  }
+
+
+  #forgetSecondActionListener(){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget second Action Listener");
+    player.socket().removeAllListeners("discard")
+  }
+
   #secondAction(){
     let player = this.#game.players()[this.#currentPlayer];
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] second action");
     var stateScope = this;
     if(player.isPlayer()){
     // ask current player to discard
-    // receive discarded cards
-    // validate discarded cards
-    // discarded to discard pile 
-    // next turn
+      player.socket().on("discard", (cards) => stateScope.#discardCards(cards));
+      player.socket().emit('discard?');
     } else {
       //bot
     }
