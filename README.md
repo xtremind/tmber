@@ -52,6 +52,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] show discard pile
 - [x] pick a card from the draw pile
 - [x] pick a card from the discard pile
+- [x] validate picked card
 
 ## IN PROGRESS
 
@@ -62,7 +63,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] validate picked card
   
 - [ ] discard 1 or more cards
 - [ ] validate discarded cards (all from hand and one of : single, double, triple, quadruple, series of 3, series of 4, series of 5)

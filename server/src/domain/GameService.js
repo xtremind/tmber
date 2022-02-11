@@ -168,18 +168,25 @@ class GameService {
   #pickACard(card){ 
     let player = this.#game.players()[this.#currentPlayer];
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card", card);
-    // add card into hand
-    this.#givenCards.get(player.uuid()).push(this.#discard.find(c => c.filename == card.name))
-    // remove card from discard
-    this.#discard = this.#discard.filter(c => c.filename != card.name)
-    // refresh cards
-    player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-    // refresh discard
-    this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
-    //
-    this.#forgetFirstActionListener();
-    // next step
-    this.#secondAction();
+    let pickedCard = this.#discard.find(c => c.filename == card.name)
+    if(typeof card == "undefined"){
+      player.socket().emit('pick?');
+    } else {
+      // add card into hand
+      let hand = this.#givenCards.get(player.uuid()).concat([pickedCard]);
+      hand.sort((a, b) => a.value - b.value);
+      this.#givenCards.set(player.uuid(), hand);
+      // remove card from discard
+      this.#discard = this.#discard.filter(c => c.filename != pickedCard.filename)
+      // refresh cards
+      player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+      // refresh discard
+      this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
+      //
+      this.#forgetFirstActionListener();
+      // next step
+      this.#secondAction();
+    }
   }
 
   #timber(){
