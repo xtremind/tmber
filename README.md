@@ -51,8 +51,10 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] show draw pile
 - [x] show discard pile
 - [x] pick a card from the draw pile
+- [x] pick a card from the discard pile
 
 ## IN PROGRESS
+
 
 ## BLOCKED
 
@@ -60,7 +62,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] pick a card from the discard pile
 - [ ] validate picked card
   
 - [ ] discard 1 or more cards

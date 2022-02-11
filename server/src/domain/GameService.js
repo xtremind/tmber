@@ -158,6 +158,7 @@ class GameService {
     this.#deck = this.#deck.slice(1, this.#deck.length);
     // refresh cards
     player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     //
     this.#forgetFirstActionListener();
     // next step
@@ -166,15 +167,19 @@ class GameService {
 
   #pickACard(card){ 
     let player = this.#game.players()[this.#currentPlayer];
-    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card");
-    // pickup a card
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card", card);
     // add card into hand
+    this.#givenCards.get(player.uuid()).push(this.#discard.find(c => c.filename == card.name))
     // remove card from discard
+    this.#discard = this.#discard.filter(c => c.filename != card.name)
     // refresh cards
     player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+    // refresh discard
+    this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     //
     this.#forgetFirstActionListener();
     // next step
+    this.#secondAction();
   }
 
   #timber(){
@@ -203,7 +208,7 @@ class GameService {
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] first action");
     var stateScope = this;
     if(player.isPlayer()){
-      player.socket().on("pick", (card) => stateScope.#pickACard());
+      player.socket().on("pick", (card) => stateScope.#pickACard(card));
       player.socket().on("draw", () => stateScope.#drawACard());
       player.socket().on("tmber", () => stateScope.#pickACard());
 

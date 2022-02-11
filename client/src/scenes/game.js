@@ -17,6 +17,8 @@ class GameScene extends Scene {
   #separateSpace = 35;
   #centerX;
   #centerY;
+  
+  #displayedElements = new Map();
 
   constructor() {
     super({
@@ -42,10 +44,12 @@ class GameScene extends Scene {
   }
 
   #showScore(scores){
+    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showScore", scores);
   }
 
   #showHand(cards){
+    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showHand", cards);
     if (typeof cards !== "undefined") this.#hand = cards;
     const posX = this.#centerX - ((this.#hand.length - 1) * this.#separateSpace)/2;
@@ -55,17 +59,30 @@ class GameScene extends Scene {
   }
 
   #showOthers(others){
+    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showOthers", others);
   }
 
   #showDiscard(discard){
     console.log("GameScene.#showDiscard", discard);
+    var sceneScope = this;
     if (typeof discard !== "undefined") this.#discard = discard;
-    
+    this.#destroyAll('discard');
+
     this.#discard.forEach((card, index) => {
-      this.add.image(this.#centerX + 100 + this.#separateSpace * (index /* +1 */), this.#centerY - (card.selected ? 50 : 0), 'cards', card.name)
-        .setInteractive()
-        .addListener('pointerdown',() => console.log("pick ", card) )
+      let image = this.add.image(this.#centerX + 100 + this.#separateSpace * (index /* +1 */), this.#centerY - (card.selected ? 50 : 0), 'cards', card.name);
+      image.setInteractive();
+      image.addListener('pointerdown',() => {
+        if (sceneScope.#currentAction == Action.PICKUP){
+          console.log("pick ", card) 
+          sceneScope.#currentAction = Action.WAIT;
+          sceneScope.sys.game.socket.emit("pick", card);
+        } else {
+          console.log("bad action"); 
+        }
+      })
+      
+    this.#add('discard', image);
     });
 
     this.#showDraw()
@@ -92,6 +109,7 @@ class GameScene extends Scene {
   }
 
   #showTimber(){
+    // FIXME : remove all elements before refreshing
     console.log("GameScene.#showTimber");
     
     /*
@@ -116,12 +134,24 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
-    sceneScope.sys.game.socket.on("pick?", () => {
-      sceneScope.#currentAction = Action.PICKUP;
-      sceneScope.#showDiscard()
-      sceneScope.#showDraw()
-    });
+    sceneScope.sys.game.socket.on("pick?", () => sceneScope.#currentAction = Action.PICKUP);
   }
+
+  #add(id, element){
+    let elements = this.#displayedElements.get(id)
+    if(typeof elements == "undefined" || elements.length == 0)
+      elements = []
+    elements.push(element);
+    this.#displayedElements.set(id, elements)
+  }
+
+  #destroyAll(id){
+    let elements = this.#displayedElements.get(id);
+    if(typeof elements == "undefined")
+      return;
+    elements.forEach(element => element.destroy())
+  }
+
 }
 
 export default GameScene;
