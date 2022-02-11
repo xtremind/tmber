@@ -60,6 +60,7 @@ class GameService {
           stateScope.#logger.debug("["+stateScope.#game.id()+"] everybody is ready - game start");
           stateScope.#startGame();
         }
+        // if player reconnect ....
       });
     });
   }
@@ -138,10 +139,10 @@ class GameService {
     this.#game.players().forEach(player => {
       if(player.isPlayer()) {
         player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-        player.socket().emit('others', [...this.#givenCards.keys()]/*.filter(key => key != player.uuid())*/.map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
       }
     });
     
+    this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
   }
 
@@ -158,6 +159,7 @@ class GameService {
     this.#deck = this.#deck.slice(1, this.#deck.length);
     // refresh cards
     player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     //
     this.#forgetFirstActionListener();
@@ -180,7 +182,7 @@ class GameService {
       this.#discard = this.#discard.filter(c => c.filename != pickedCard.filename)
       // refresh cards
       player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-      // refresh discard
+      this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
       this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
       //
       this.#forgetFirstActionListener();

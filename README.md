@@ -57,6 +57,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] validate discarded cards (all from hand and one of : single, double, triple, quadruple, series of 3, series of 4, series of 5)
 - [x] next player
 - [x] show others
+- [x] updates others cards when action
 
 ## IN PROGRESS
 
@@ -81,6 +82,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] end game (score > 100)
 - [ ] "score" scene
 - [ ] "achievement" scene
-- [ ] 
+- [ ] configuration file for difficulties
 
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
