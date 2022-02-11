@@ -70,24 +70,9 @@ class GameScene extends Scene {
       });
       this.#add('hand', image);
     });
-    //if at least 1 selected, display discard button
-    if(this.#hand.some(card => card.selected) && sceneScope.#currentAction == Action.DISCARD){
-      let discardButton = Graphics.drawButton(sceneScope,
-        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
-        Styles.hostButton, "discard", Styles.hostText, "discard",
-        () => {
-          console.log("GameScene.#showHand - discard");
-          if (sceneScope.#currentAction == Action.DISCARD){
-            sceneScope.#currentAction = Action.WAIT;
-            sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
-          } else {
-            console.log("bad action"); 
-          }
-        }
-      );
-      
-      this.#add('hand', discardButton);
-    }
+
+    this.#showTimberButton();
+    this.#showDiscardButton()
   }
 
   #showOthers(others){
@@ -157,26 +142,52 @@ class GameScene extends Scene {
       }) //=> only that one will have a listener
   }
 
-  #showTimber(){
-    console.log("GameScene.#showTimber");
+  #showTimberButton(){
+    console.log("GameScene.#showTimberButton");
     this.#destroyAll('tmber');
+    var sceneScope = this;
 
-    if(sceneScope.#currentAction == Action.DISCARD){
-      let tmber = Graphics.drawButton(sceneScope,
+    if(sceneScope.#currentAction == Action.PICKUP && this.#hand.reduce((p, c) => p + c.value, 0) <= 7){
+      let tmberButton = Graphics.drawButton(sceneScope,
         {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
         Styles.hostButton, "tmber", Styles.hostText, "tmber",
         () => {
-          console.log("GameScene.#showTimber");
-          /*if (sceneScope.#currentAction == Action.DISCARD){
+          console.log("GameScene.#showTimberButton");
+          if (sceneScope.#currentAction == Action.PICKUP){
+            sceneScope.#currentAction = Action.WAIT;
+            sceneScope.sys.game.socket.emit("tmber");
+          } else {
+            console.log("bad action"); 
+          }
+        }
+      );
+      
+      this.#add('tmber', tmberButton);
+    }
+  }
+
+  #showDiscardButton(){
+    console.log("GameScene.#showDiscardButton");
+    this.#destroyAll('disc');
+    var sceneScope = this;
+
+    //if at least 1 selected, display discard button
+    if(this.#hand.some(card => card.selected) && sceneScope.#currentAction == Action.DISCARD){
+      let discardButton = Graphics.drawButton(sceneScope,
+        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
+        Styles.hostButton, "discard", Styles.hostText, "discard",
+        () => {
+          console.log("GameScene.#showDiscardButton - discard");
+          if (sceneScope.#currentAction == Action.DISCARD){
             sceneScope.#currentAction = Action.WAIT;
             sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
           } else {
             console.log("bad action"); 
-          }*/
+          }
         }
       );
       
-      this.#add('tmber', tmber);
+      this.#add('disc', discardButton);
     }
   }
 
@@ -189,7 +200,10 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
-    sceneScope.sys.game.socket.on("pick?", () => sceneScope.#currentAction = Action.PICKUP);
+    sceneScope.sys.game.socket.on("pick?", () => {
+      sceneScope.#currentAction = Action.PICKUP;
+      sceneScope.#showHand();
+    })
     sceneScope.sys.game.socket.on("discard?", () => {
       sceneScope.#currentAction = Action.DISCARD; 
       sceneScope.#showHand();

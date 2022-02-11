@@ -58,8 +58,10 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] next player
 - [x] show others
 - [x] updates others cards when action
+- [x] send "timber"
 
 ## IN PROGRESS
+
 
 ## BLOCKED
 
@@ -69,9 +71,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 - [ ] show error message is present
 
-- [ ] "timber"
-- [ ] validate timber (score < 7)
-
+- [ ] validate timber (score <= 7)
 - [ ] compute current score
 - [ ] display current score
 

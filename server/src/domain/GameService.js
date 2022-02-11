@@ -219,7 +219,7 @@ class GameService {
     if(player.isPlayer()){
       player.socket().on("pick", (card) => stateScope.#pickACard(card));
       player.socket().on("draw", () => stateScope.#drawACard());
-      player.socket().on("tmber", () => stateScope.#pickACard());
+      player.socket().on("tmber", () => stateScope.#timber());
 
       player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     } else {
