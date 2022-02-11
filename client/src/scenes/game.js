@@ -78,7 +78,6 @@ class GameScene extends Scene {
           console.log("GameScene.#showHand - discard");
           if (sceneScope.#currentAction == Action.DISCARD){
             sceneScope.#currentAction = Action.WAIT;
-            sceneScope.#showHand();
             sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
           } else {
             console.log("bad action"); 
@@ -164,7 +163,10 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
     sceneScope.sys.game.socket.on("pick?", () => sceneScope.#currentAction = Action.PICKUP);
-    sceneScope.sys.game.socket.on("discard?", () => sceneScope.#currentAction = Action.DISCARD);
+    sceneScope.sys.game.socket.on("discard?", () => {
+      sceneScope.#currentAction = Action.DISCARD; 
+      sceneScope.#showHand();
+    });
   }
 
   #add(id, element){

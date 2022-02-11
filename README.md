@@ -54,9 +54,10 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] pick a card from the discard pile
 - [x] validate picked card
 - [x] discard 1 or more cards
+- [x] validate discarded cards (all from hand and one of : single, double, triple, quadruple, series of 3, series of 4, series of 5)
+- [x] next player
 
 ## IN PROGRESS
-
 
 ## BLOCKED
 
@@ -64,10 +65,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-  
-- [ ] validate discarded cards (all from hand and one of : single, double, triple, quadruple, series of 3, series of 4, series of 5)
-
-- [ ] next player
+- [ ] show others
+- [ ] show error message is present
 
 - [ ] "timber"
 - [ ] validate timber (score < 7)

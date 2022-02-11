@@ -73,8 +73,6 @@ class GameService {
     this.#broadcast('players', this.#game.players().map(p => {return {"uuid": p.uuid(), "name": p.name()}}));
     this.#nextPlay();
     this.#nextTurn();
-    this.#showBoard();
-    this.#firstAction();
   }
   
   #nextPlay(){
@@ -106,7 +104,7 @@ class GameService {
     this.#game.players().forEach(player => {
       let hand = this.#deck.slice(0, 5);
       hand.sort(function (a, b) {
-        return a.value - b.value;
+        return a.rank - b.rank;
       });
       this.#givenCards.set(player.uuid(), hand);
       this.#deck = this.#deck.slice(5, this.#deck.length);
@@ -122,6 +120,8 @@ class GameService {
   #nextTurn(){
     this.#logger.debug("["+this.#game.id()+"] prepareTurnPlay");
     this.#computeNextCurrentPlayer();
+    this.#showBoard();
+    this.#firstAction();
   }
   
   #computeNextCurrentPlayer(){
@@ -152,7 +152,7 @@ class GameService {
     var card = this.#deck.slice(0, 1);
     // add card into hand
     let hand = this.#givenCards.get(player.uuid()).concat(card);
-    hand.sort((a, b) => a.value - b.value);
+    hand.sort((a, b) => a.rank - b.rank);
     this.#givenCards.set(player.uuid(), hand);
     // remove card from draw
     this.#deck = this.#deck.slice(1, this.#deck.length);
@@ -174,7 +174,7 @@ class GameService {
     } else {
       // add card into hand
       let hand = this.#givenCards.get(player.uuid()).concat([pickedCard]);
-      hand.sort((a, b) => a.value - b.value);
+      hand.sort((a, b) => a.rank - b.rank);
       this.#givenCards.set(player.uuid(), hand);
       // remove card from discard
       this.#discard = this.#discard.filter(c => c.filename != pickedCard.filename)
@@ -219,7 +219,7 @@ class GameService {
       player.socket().on("draw", () => stateScope.#drawACard());
       player.socket().on("tmber", () => stateScope.#pickACard());
 
-      player.socket().emit('pick?');
+      player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     } else {
       //bot
     }
@@ -230,12 +230,38 @@ class GameService {
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] discard cards", cards);
     // receive discarded cards
     // validate discarded cards
-    // discarded to discard pile 
-    //
-    this.#forgetSecondActionListener();
-    // next turn
+    if(this.#validateDiscard(cards)){
+      //the cards 
+      let discarded = this.#givenCards.get(player.uuid()).filter(card => cards.some(c => c.name == card.filename));
+      // discarded to discard pile
+      this.#discard = discarded;
+      // update player hand
+      let hand = this.#givenCards.get(player.uuid())
+      discarded.forEach(card => hand = hand.filter(c => c.filename != card.filename))
+      this.#givenCards.set(player.uuid(), hand)
+      // update board
+      this.#showBoard();
+      //
+      this.#forgetSecondActionListener();
+      // next turn 
+      this.#nextTurn()
+    } else {
+      player.socket().emit('discard?', {'message' : 'bad selection, retry'});
+    }
   }
 
+  #validateDiscard(cards){
+    let player = this.#game.players()[this.#currentPlayer];
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] validate discard");
+    let result = cards.length > 0;
+    result = result && cards.every(c1 => this.#givenCards.get(player.uuid()).some(c2 => c1.name == c2.filename)) //player has all discarded card
+    let discarded = this.#givenCards.get(player.uuid()).filter(card => cards.some(c => c.name == card.filename));
+    result = result && (
+      (discarded.length == 3 && discarded.every( (element, index) => index == 0 ? true : (element.rank == discarded[index-1].rank+1 && element.suit == discarded[index-1].suit)  )) || // at least 3 consecutive cards with same suits
+      discarded.every( (element, index) => index == 0 ? true : element.rank == discarded[index-1].rank ));      // card with same values
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] validate discard " + result);
+    return result;
+  }
 
   #forgetSecondActionListener(){
     let player = this.#game.players()[this.#currentPlayer];
