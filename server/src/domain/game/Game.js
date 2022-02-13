@@ -1,4 +1,5 @@
 const State = require("./State");
+const difficulty = require('../../../../commons/configuration/difficulties.json')
 
 class Game {
 
@@ -6,6 +7,7 @@ class Game {
   #host = {};
   #players = [];
   #status = State.WAITING;
+  #difficulty = difficulty.normal
 
   constructor(id, host) {
     this.#id = id;
@@ -59,11 +61,11 @@ class Game {
   }
 
   isWaitingPlayer(){
-    return this.#status === State.WAITING && this.#players.length < 8
+    return this.#status === State.WAITING && this.#players.length < this.#difficulty.maxPlayers
   }
 
   isReadyToStart(){
-    return this.#status === State.WAITING && this.#players.length <= 8 && this.#players.length > 2
+    return this.#status === State.WAITING && this.#players.length <= this.#difficulty.maxPlayers && this.#players.length > this.#difficulty.minPlayers
   }
 
   start(){
@@ -72,6 +74,10 @@ class Game {
 
   end(){
     this.#status = State.END;
+  }
+
+  difficulty(){
+    return this.#difficulty;
   }
 }
 

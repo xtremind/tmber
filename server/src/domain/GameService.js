@@ -1,7 +1,6 @@
 
 const {cards} = require('../infrastructure/cards/deck.json');
 
-
 class GameService {
 
   #io;
@@ -194,14 +193,65 @@ class GameService {
   #timber(){
     let player = this.#game.players()[this.#currentPlayer];
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] timber");
-        // receive timber
-          // validate timber
-          // compute play score
-          // show current play score
+    let scoreTmber = this.#computeCurrentScore(this.#givenCards.get(player.uuid()));
+    let affectMalus = false;
+    if (this.#validateTimber(scoreTmber)){
+      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] valid timber");
+      
+      let current = new Map();      // global score
+      // compute play score
+      this.#game.players().forEach(p => {
+        let score = this.#computeCurrentScore(this.#givenCards.get(p.uuid()))
+        current.set(p.uuid(), score);
+        this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] score : "+ score);
+        if(player.uuid() != p.uuid() && scoreTmber >= score){
+          affectMalus = true;
+        }
+      });
+
+      if(affectMalus){
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] another player has lesser point than the player ");
+        current.set(player.uuid(), current.get(player.uuid()) + this.#game.difficulty().malus);
+      }
+
+      let endGame = false;
+      // show current play score
+      this.#game.players().forEach(p => {
+        let nextScore =  this.#scores.get(p.uuid()).score + current.get(p.uuid())
+        this.#scores.set(p.uuid(), {uuid : p.uuid(), score: nextScore})
+        this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
+
           // if nobody has more than 100 point
-            // next play
-          // else 
-            // end game
+        if(nextScore >= this.#game.difficulty().endGame){
+          endGame = true
+        }
+      })
+
+      this.#forgetFirstActionListener();
+      if(endGame){
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
+        this.#game.end();
+        // end game
+      } else {
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
+        this.#nextPlay();
+        this.#nextTurn();
+      }
+
+    } else {
+      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] invalid timber");
+      player.socket().emit('pick?');
+    }
+  }
+
+  #validateTimber(score){
+    this.#logger.debug("["+this.#game.id()+"] validate timber");
+    return score <= this.#game.difficulty().maxTmber;
+  }
+
+  #computeCurrentScore(cards){
+    this.#logger.debug("["+this.#game.id()+"] compute current score"/*, cards*/);
+    return cards.reduce((p, c) => p + c.value, 0);
   }
 
   #forgetFirstActionListener(){

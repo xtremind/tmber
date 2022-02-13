@@ -60,6 +60,11 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] updates others cards when action
 - [x] send "timber"
 - [x] add configuration file 
+- [x] validate timber (score <= 7)
+- [x] compute current score
+- [x] next play
+- [x] define next starting player
+- [x] end game (score > 100)
 
 ## IN PROGRESS
 
@@ -70,19 +75,15 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
+- [ ] if no more card in draw => computer score
+- [ ] render draw depending on the number of cards in it.
 - [ ] show error message is present
-
-- [ ] validate timber (score <= 7)
-- [ ] compute current score
 - [ ] display current score
-
 - [ ] compute global score
-
-- [ ] next play
-- [ ] define next starting player
-- [ ] end game (score > 100)
-- [ ] "score" scene
-- [ ] "achievement" scene
-- [ ] configuration file for difficulties
+- [ ] "achievement" scene once game has ended
+- [ ] improve reconnect a player (only show deck actually)
+- [ ] improve how others cards are shown
+- [ ] extra rules : if global score is a multiple to 100 => -50
 
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
+- [ ] (optional) improve security (answering player == current player)

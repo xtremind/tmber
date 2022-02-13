@@ -80,7 +80,7 @@ class ManagementService {
     var currentGame = this.#games.get(data.id);
     
     if (typeof currentGame !== "undefined" && currentGame.status() == State.WAITING) {
-        if(currentGame.players().length > 8 ){
+        if(currentGame.players().length > currentGame.difficulty().maxPlayers ){
           currentPlayer.socket().emit("error", { message: "too many player in game" });
         }
         currentGame.add(currentPlayer);
@@ -104,7 +104,7 @@ class ManagementService {
     this.#logger.debug("["+playerId+"] add a bot", data);
     var currentGame = this.#games.get(data.id);
     if (typeof currentGame !== "undefined") {
-      if(currentGame.players().length > 8 ){
+      if(currentGame.players().length > currentGame.difficulty().maxPlayers ){
         currentPlayer.socket().emit("error", { message: "too many player in game" });
       }
       var bot = new Bot();
