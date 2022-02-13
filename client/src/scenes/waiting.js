@@ -5,6 +5,8 @@ import { Scene } from "phaser";
 import Graphics from "utils/Graphics";
 import Styles from "utils/Styles";
 
+import difficulty from 'commons/configuration/difficulties.json';
+
 class WaitingScene extends Scene {
   constructor() {
     super({
@@ -153,7 +155,7 @@ class WaitingScene extends Scene {
     const sceneScope = this;
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
-      if (typeof sceneScope.startButton == "undefined" && nbPlayers > 2 ){
+      if (typeof sceneScope.startButton == "undefined" && nbPlayers > difficulty.normal.minPlayers ){
         sceneScope.startButton = Graphics.drawButton(sceneScope,
           {x: screenCenterX - 200, y: 350, height: 50,width: 200,},
           Styles.hostButton, "start game", Styles.hostText, "start game",
@@ -163,7 +165,7 @@ class WaitingScene extends Scene {
           }
         );
       }
-      if (typeof sceneScope.startButton != "undefined" && nbPlayers <= 2){
+      if (typeof sceneScope.startButton != "undefined" && nbPlayers <= difficulty.normal.minPlayers){
         sceneScope.startButton.destroy()
         sceneScope.startButton = undefined;
       }
@@ -175,13 +177,13 @@ class WaitingScene extends Scene {
     const sceneScope = this;
     // if hoster : button add Bot if less than 8 players
     if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
-      if (typeof sceneScope.botButton == "undefined" && nbPlayers < 8 ){
+      if (typeof sceneScope.botButton == "undefined" && nbPlayers < difficulty.normal.maxPlayers ){
         sceneScope.botButton = Graphics.drawButton(sceneScope, { x: sceneScope.cameras.main.centerX - 200, y: 420, height: 50, width: 200 }, Styles.startButton, 'add Bot', Styles.startText, 'add Bot', function () {
           console.log("WaitingScene.create - add bot");
           sceneScope.sys.game.socket.emit('add bot', { id: sceneScope.sys.game.currentGameId });
         });
       }
-      if (typeof sceneScope.botButton != "undefined" && nbPlayers >= 8){
+      if (typeof sceneScope.botButton != "undefined" && nbPlayers >= difficulty.normal.maxPlayers){
         sceneScope.botButton.destroy()
         sceneScope.botButton = undefined;
       }

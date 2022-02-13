@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "rm -Rf dist && concurrently -p \"name\" -n \"server,client\" -c \"red,blue\" \"npm run watch:server\" \"npm run watch:client\"",
     "watch:client": "webpack --watch --mode development",
-    "watch:server": "nodemon --inspect server/src/main.js --watch \"./dist\" --watch \"./server/src\"",
+    "watch:server": "nodemon --inspect server/src/main.js --watch \"./dist\" --watch \"./server/src\" --watch \"./commons\"",
     "watch:client:only": "rm -Rf dist && concurrently -p \"name\" -n \"server,client\" -c \"red,blue\" \"npm run start\" \"npm run watch:client\"",
     "test": "jest",
     "build": "webpack --mode production",

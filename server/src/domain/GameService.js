@@ -1,5 +1,5 @@
 
-const {cards} = require('../infrastructure/cards/cards.json');
+const {cards} = require('../infrastructure/cards/deck.json');
 
 
 class GameService {

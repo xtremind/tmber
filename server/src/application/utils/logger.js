@@ -14,7 +14,8 @@ const myFormat = printf(({ level, message, timestamp, ...metadata }) => {
 });
 
 const logger = createLogger({
-  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  level: "debug",
+  //level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: combine(
     errors({ stack: true }),
     colorize(),

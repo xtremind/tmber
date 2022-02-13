@@ -4,7 +4,8 @@ import { Scene } from "phaser";
 // Internal Modules
 import Graphics from "utils/Graphics";
 import Styles from "utils/Styles";
-import Action from 'commons/Action'
+import Action from 'commons/entities/Action'
+import difficulty from 'commons/configuration/difficulties.json';
 
 
 class GameScene extends Scene {
@@ -147,7 +148,7 @@ class GameScene extends Scene {
     this.#destroyAll('tmber');
     var sceneScope = this;
 
-    if(sceneScope.#currentAction == Action.PICKUP && this.#hand.reduce((p, c) => p + c.value, 0) <= 7){
+    if(sceneScope.#currentAction == Action.PICKUP && this.#hand.reduce((p, c) => p + c.value, 0) <= difficulty.normal.maxTmber){
       let tmberButton = Graphics.drawButton(sceneScope,
         {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
         Styles.hostButton, "tmber", Styles.hostText, "tmber",

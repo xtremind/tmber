@@ -59,6 +59,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] show others
 - [x] updates others cards when action
 - [x] send "timber"
+- [x] add configuration file 
 
 ## IN PROGRESS
 
