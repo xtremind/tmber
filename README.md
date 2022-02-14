@@ -81,9 +81,10 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] display current score
 - [ ] compute global score
 - [ ] "achievement" scene once game has ended
-- [ ] improve reconnect a player (only show deck actually)
+- [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
 - [ ] improve how others cards are shown
 - [ ] extra rules : if global score is a multiple to 100 => -50
 
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
 - [ ] (optional) improve security (answering player == current player)
+- [ ] (optional) choose difficulty

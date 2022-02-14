@@ -240,7 +240,7 @@ class GameService {
 
     } else {
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] invalid timber");
-      player.socket().emit('pick?');
+      player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     }
   }
 
@@ -271,7 +271,7 @@ class GameService {
       player.socket().on("draw", () => stateScope.#drawACard());
       player.socket().on("tmber", () => stateScope.#timber());
 
-      player.socket().emit('pick?', {'message' : 'bad pick, retry'});
+      player.socket().emit('pick?');
     } else {
       //bot
     }
@@ -291,8 +291,6 @@ class GameService {
       let hand = this.#givenCards.get(player.uuid())
       discarded.forEach(card => hand = hand.filter(c => c.filename != card.filename))
       this.#givenCards.set(player.uuid(), hand)
-      // update board
-      this.#showBoard();
       //
       this.#forgetSecondActionListener();
       // next turn 
