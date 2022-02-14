@@ -11,11 +11,12 @@ import difficulty from 'commons/configuration/difficulties.json';
 class GameScene extends Scene {
   
   #players = new Map();
+  #scores= new Map();
   #hand = [];
   #discard = [];
   #others = [];
-  #currentAction = Action.WAIT;
 
+  #currentAction = Action.WAIT;
   #separateSpace = 35;
   #centerX;
   #centerY;
@@ -46,9 +47,14 @@ class GameScene extends Scene {
     sceneScope.#showDraw();
   }
 
-  #showScore(scores){
-    // FIXME : remove all elements before refreshing
-    console.log("GameScene.#showScore", scores);
+  #prepareScore(scores){
+    console.log("GameScene.#prepareScore", scores);
+    var sceneScope = this;
+    if (typeof scores == "undefined") return ;
+
+    scores.forEach(p => {
+      this.#scores.set(p.uuid, p.score);
+    });
   }
 
   #showHand(cards){
@@ -73,8 +79,18 @@ class GameScene extends Scene {
       this.#add('hand', image);
     });
 
+    this.#showScore();
     this.#showTimberButton();
     this.#showDiscardButton()
+  }
+
+  #showScore(){
+    console.log("GameScene.#showScore");
+    this.#destroyAll('score');
+    let posX = this.cameras.main.worldView.x + this.cameras.main.width;
+    let posY = this.cameras.main.worldView.y + this.cameras.main.height;
+    let score = this.add.text(posX - 25, posY - 20, this.#scores.get(this.sys.game.currentUuid), Styles.playerNameText).setOrigin(1, 1);
+    this.#add('score', score);
   }
 
   #showOthers(others){
@@ -96,10 +112,11 @@ class GameScene extends Scene {
         this.#add('others', this.add.image(posX + j * 10, posY - j * 10, 'cards', 'back'));
       }
 
-      //display player's name
-      let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name, Styles.playerNameText).setOrigin(0.5, 0);
+      //display player's name and score
+      let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name + " (" + this.#scores.get(other.uuid) + ")", Styles.playerNameText).setOrigin(0.5, 0);
       this.#blink(name, this.#players.get(other.uuid).current);
       this.#add('others', name);
+
     }
 
   }
@@ -204,7 +221,7 @@ class GameScene extends Scene {
     var sceneScope = this;
     
     sceneScope.sys.game.socket.on("players", players => players.forEach(player => sceneScope.#players.set(player.uuid, player)));
-    sceneScope.sys.game.socket.on("score", scores => sceneScope.#showScore(scores));
+    sceneScope.sys.game.socket.on("score", scores => sceneScope.#prepareScore(scores));
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));

@@ -66,6 +66,9 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] define next starting player
 - [x] end game (score > 100)
 - [x] display current player with feedback
+- [x] compute global score
+- [x] display global score
+- [x] if no more card in draw => computer score
 
 ## IN PROGRESS
 
@@ -76,11 +79,9 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] if no more card in draw => computer score
 - [ ] render draw depending on the number of cards in it.
 - [ ] show error message is present
 - [ ] display current score
-- [ ] compute global score
 - [ ] "achievement" scene once game has ended
 - [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
 - [ ] improve how others cards are shown

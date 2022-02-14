@@ -38,7 +38,7 @@ class GameService {
 
   #initiateScore(){
     this.#logger.debug("["+this.#game.id()+"] initiateScore");
-    this.#game.players().forEach(p => this.#scores.set(p.uuid(), {uuid : p.uuid(), score: 0}))
+    this.#game.players().forEach(p => this.#scores.set(p.uuid(), 0))
   }
 
   #setEventHandlers(){
@@ -239,8 +239,8 @@ class GameService {
     let endGame = false;
     // show current play score
     this.#game.players().forEach(p => {
-      let nextScore =  this.#scores.get(p.uuid()).score + current.get(p.uuid())
-      this.#scores.set(p.uuid(), {uuid : p.uuid(), score: nextScore})
+      let nextScore =  this.#scores.get(p.uuid()) + current.get(p.uuid())
+      this.#scores.set(p.uuid(), nextScore)
       this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
 
         // if nobody has more than 100 point
@@ -321,7 +321,7 @@ class GameService {
     result = result && cards.every(c1 => this.#givenCards.get(player.uuid()).some(c2 => c1.name == c2.filename)) //player has all discarded card
     let discarded = this.#givenCards.get(player.uuid()).filter(card => cards.some(c => c.name == card.filename));
     result = result && (
-      (discarded.length == 3 && discarded.every( (element, index) => index == 0 ? true : (element.rank == discarded[index-1].rank+1 && element.suit == discarded[index-1].suit)  )) || // at least 3 consecutive cards with same suits
+      (discarded.length >= 3 && discarded.every( (element, index) => index == 0 ? true : (element.rank == discarded[index-1].rank+1 && element.suit == discarded[index-1].suit)  )) || // at least 3 consecutive cards with same suits
       discarded.every( (element, index) => index == 0 ? true : element.rank == discarded[index-1].rank ));      // card with same values
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] validate discard " + result);
     return result;
