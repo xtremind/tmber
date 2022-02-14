@@ -41,7 +41,8 @@ class GameScene extends Scene {
     console.log("GameScene.#createBoard");
     const sceneScope = this;
     //add background image
-    sceneScope.add.image(0, 0, "cardTable").setOrigin(0);
+    let back = sceneScope.add.image(0, 0, "cardTable").setOrigin(0);
+    this.#add('background', back);
     sceneScope.#showDraw();
   }
 
@@ -96,7 +97,9 @@ class GameScene extends Scene {
       }
 
       //display player's name
-      this.#add('others', this.add.text(posX, posY + 100, this.#players.get(other.uuid).name, Styles.playerNameText).setOrigin(0.5, 0));
+      let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name, Styles.playerNameText).setOrigin(0.5, 0);
+      this.#blink(name, this.#players.get(other.uuid).current);
+      this.#add('others', name);
     }
 
   }
@@ -114,6 +117,7 @@ class GameScene extends Scene {
         if (sceneScope.#currentAction == Action.PICKUP){
           console.log("pick ", card) 
           sceneScope.#currentAction = Action.WAIT;
+          sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], false);
           sceneScope.sys.game.socket.emit("pick", card);
         } else {
           console.log("bad action"); 
@@ -136,6 +140,7 @@ class GameScene extends Scene {
         if (sceneScope.#currentAction == Action.PICKUP){
           console.log("draw"); 
           sceneScope.#currentAction = Action.WAIT;
+          sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], false);
           sceneScope.sys.game.socket.emit("draw");
         } else {
           console.log("bad action"); 
@@ -145,7 +150,7 @@ class GameScene extends Scene {
 
   #showTimberButton(){
     console.log("GameScene.#showTimberButton");
-    this.#destroyAll('tmber');
+    this.#destroyAll('tmberButton');
     var sceneScope = this;
 
     if(sceneScope.#currentAction == Action.PICKUP && this.#hand.reduce((p, c) => p + c.value, 0) <= difficulty.normal.maxTmber){
@@ -156,6 +161,7 @@ class GameScene extends Scene {
           console.log("GameScene.#showTimberButton");
           if (sceneScope.#currentAction == Action.PICKUP){
             sceneScope.#currentAction = Action.WAIT;
+            sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], false);
             sceneScope.sys.game.socket.emit("tmber");
           } else {
             console.log("bad action"); 
@@ -163,13 +169,13 @@ class GameScene extends Scene {
         }
       );
       
-      this.#add('tmber', tmberButton);
+      this.#add('tmberButton', tmberButton);
     }
   }
 
   #showDiscardButton(){
     console.log("GameScene.#showDiscardButton");
-    this.#destroyAll('disc');
+    this.#destroyAll('discardButton');
     var sceneScope = this;
 
     //if at least 1 selected, display discard button
@@ -181,6 +187,7 @@ class GameScene extends Scene {
           console.log("GameScene.#showDiscardButton - discard");
           if (sceneScope.#currentAction == Action.DISCARD){
             sceneScope.#currentAction = Action.WAIT;
+            sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], false);
             sceneScope.sys.game.socket.emit("discard", sceneScope.#hand.filter(card => card.selected).map(card => {return {"name":card.name}}));
           } else {
             console.log("bad action"); 
@@ -188,7 +195,7 @@ class GameScene extends Scene {
         }
       );
       
-      this.#add('disc', discardButton);
+      this.#add('discardButton', discardButton);
     }
   }
 
@@ -202,10 +209,12 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
     sceneScope.sys.game.socket.on("pick?", () => {
+      sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
       sceneScope.#currentAction = Action.PICKUP;
       sceneScope.#showHand();
     })
     sceneScope.sys.game.socket.on("discard?", () => {
+      sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
       sceneScope.#currentAction = Action.DISCARD; 
       sceneScope.#showHand();
     });
@@ -217,6 +226,15 @@ class GameScene extends Scene {
       elements = []
     elements.push(element);
     this.#displayedElements.set(id, elements)
+  }
+
+  #blink(element, active){
+    if(active){
+      element.repeat = true;
+      Graphics.blink(this, element)
+    } else {
+      element.repeat=false
+    }
   }
 
   #destroyAll(id){

@@ -131,6 +131,8 @@ class GameService {
     } else {
       this.#currentPlayer = (this.#currentPlayer + 1) % this.#game.players().length ;
     }
+    //send players
+    this.#broadcast('players', this.#game.players().map(p => {return {"uuid": p.uuid(), "name": p.name(), "current": this.#game.players()[this.#currentPlayer].uuid() == p.uuid()}}));
   }
 
   #showBoard(){

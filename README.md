@@ -65,6 +65,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] next play
 - [x] define next starting player
 - [x] end game (score > 100)
+- [x] display current player with feedback
 
 ## IN PROGRESS
 

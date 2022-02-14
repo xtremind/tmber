@@ -54,6 +54,64 @@
   return container;
 };
 
+const showError = function (scene, error){
+  console.log("Graphics.showError: " + error);
+  var errorMessage = scene.add.text(scene.cameras.main.worldView.x + scene.cameras.main.width / 2, 50, error, { font: '32px Courier bold', fill: '#FF5733' });
+  errorMessage.setOrigin(0.5);
+  errorMessage.setAlpha(0);
+
+  scene.tweens.add({
+    targets: errorMessage,
+    alpha: 1,
+    delay: 0,
+    duration: 1000,
+    onComplete : () => {
+      scene.tweens.add({
+        targets: errorMessage,
+        alpha: 0,
+        delay: 2000,
+        duration: 1000,
+        onComplete : () => {
+          errorMessage.destroy()
+        }
+      });
+    }
+  });
+}
+
+const blink = function (scene, element, easing = 'Linear', overallDuration = 500, visiblePauseDuration = 125){
+  
+  let flashDuration = overallDuration - visiblePauseDuration / 2;
+
+  scene.tweens.timeline({
+    tweens: [
+        {
+            targets: element,
+            duration: visiblePauseDuration,
+            alpha: 1,
+            ease: easing
+        },
+        {
+            targets: element,
+            duration: flashDuration,
+            alpha: 0,
+            ease: easing
+        },
+        {
+            targets: element,
+            duration: flashDuration,
+            alpha: 1,
+            ease: easing,
+            onComplete: () => {
+                if (element.repeat === true) {
+                    this.blink(scene, element);
+                }
+            }
+        },
+    ]
+  });
+}
+
 const del = function(container){
   container.destroy();
   return null;
@@ -61,5 +119,7 @@ const del = function(container){
 
 export default {
     drawButton,
-    del
+    del,
+    showError,
+    blink
 }

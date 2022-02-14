@@ -12,6 +12,7 @@ import GameScene from 'scenes/game';
 // Declare configuration
 const config = {
   type: Phaser.AUTO,
+  backgroundColor: '#22b34e',
   scale: {
     mode: Phaser.Scale.FIT,
     parent: 'phaser-example',
