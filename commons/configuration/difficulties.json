@@ -1,12 +1,12 @@
 {
   "normal":
   {
-    "minPlayers": 2,
+    "minPlayers": 1,
     "maxPlayers": 7,
-    "startingHand": 5,
-    "maxTmber": 7,
+    "startingHand": 25,
+    "maxTmber": 700,
     "malus": 25,
-    "endGame": 100,
+    "endGame": 10,
     "extraRules": false
   },
   "hard":

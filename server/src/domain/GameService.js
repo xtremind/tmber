@@ -102,12 +102,12 @@ class GameService {
   #distributeGiven(){
     this.#logger.debug("["+this.#game.id()+"] distributeGiven");
     this.#game.players().forEach(player => {
-      let hand = this.#deck.slice(0, 5);
+      let hand = this.#deck.slice(0, this.#game.difficulty().startingHand);
       hand.sort(function (a, b) {
         return a.rank - b.rank;
       });
       this.#givenCards.set(player.uuid(), hand);
-      this.#deck = this.#deck.slice(5, this.#deck.length);
+      this.#deck = this.#deck.slice(this.#game.difficulty().startingHand, this.#deck.length);
     });
   }
 
@@ -196,40 +196,12 @@ class GameService {
     let player = this.#game.players()[this.#currentPlayer];
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] timber");
     let scoreTmber = this.#computeCurrentScore(this.#givenCards.get(player.uuid()));
-    let affectMalus = false;
     if (this.#validateTimber(scoreTmber)){
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] valid timber");
-      
-      let current = new Map();      // global score
-      // compute play score
-      this.#game.players().forEach(p => {
-        let score = this.#computeCurrentScore(this.#givenCards.get(p.uuid()))
-        current.set(p.uuid(), score);
-        this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] score : "+ score);
-        if(player.uuid() != p.uuid() && scoreTmber >= score){
-          affectMalus = true;
-        }
-      });
-
-      if(affectMalus){
-        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] another player has lesser point than the player ");
-        current.set(player.uuid(), current.get(player.uuid()) + this.#game.difficulty().malus);
-      }
-
-      let endGame = false;
-      // show current play score
-      this.#game.players().forEach(p => {
-        let nextScore =  this.#scores.get(p.uuid()).score + current.get(p.uuid())
-        this.#scores.set(p.uuid(), {uuid : p.uuid(), score: nextScore})
-        this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
-
-          // if nobody has more than 100 point
-        if(nextScore >= this.#game.difficulty().endGame){
-          endGame = true
-        }
-      })
+      let endGame = this.#computeScore(player, scoreTmber);
 
       this.#forgetFirstActionListener();
+
       if(endGame){
         this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
         this.#game.end();
@@ -244,6 +216,39 @@ class GameService {
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] invalid timber");
       player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     }
+  }
+
+  #computeScore(player, scoreTmber){
+    let affectMalus = false;
+    let current = new Map();      // global score
+    // compute play score
+    this.#game.players().forEach(p => {
+      let score = this.#computeCurrentScore(this.#givenCards.get(p.uuid()))
+      current.set(p.uuid(), score);
+      this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] score : "+ score);
+      if(player.uuid() != p.uuid() && scoreTmber >= score){
+        affectMalus = true;
+      }
+    });
+
+    if(affectMalus){
+      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] another player has lesser point than the player ");
+      current.set(player.uuid(), current.get(player.uuid()) + this.#game.difficulty().malus);
+    }
+
+    let endGame = false;
+    // show current play score
+    this.#game.players().forEach(p => {
+      let nextScore =  this.#scores.get(p.uuid()).score + current.get(p.uuid())
+      this.#scores.set(p.uuid(), {uuid : p.uuid(), score: nextScore})
+      this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
+
+        // if nobody has more than 100 point
+      if(nextScore >= this.#game.difficulty().endGame){
+        endGame = true
+      }
+    })
+    return endGame
   }
 
   #validateTimber(score){
@@ -295,8 +300,15 @@ class GameService {
       this.#givenCards.set(player.uuid(), hand)
       //
       this.#forgetSecondActionListener();
-      // next turn 
-      this.#nextTurn()
+      if(this.#deck.length > 0 ){
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
+        this.#nextTurn()
+      } else {
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] No more card to play - End Play");
+        this.#computeScore(player, 0)
+        this.#nextPlay();
+        this.#nextTurn();
+      }
     } else {
       player.socket().emit('discard?', {'message' : 'bad selection, retry'});
     }
@@ -333,41 +345,6 @@ class GameService {
       //bot
     }
   }
-
-  // game
-    // compute next starting player 
-    // randomize deck
-    // distribute given
-    // play
-      // compute next current player
-      // turn
-        // update board (cards / draw / discard / game score)
-        // ask current player to pickup
-          // receive a pickup card
-          // validate picked card
-          // remove card from discard
-          // update board (cards / draw / discard / game score)
-          // ask current player to discard
-          // receive discarded cards
-          // validate discarded cards
-          // discarded to discard pile 
-          // end turn
-        // OR
-          // receive timber
-          // validate timber
-          // compute play score
-          // show current play score
-          // if nobody has more than 100 point
-            // end play
-          // else 
-            // end game
-        // if not validated, go back to current turn with error message
-      // end turn => when a player has done all possible action
-      
-
-    // end play => when timber or no more card to draw
-    
-  // end game => when a player has more than 100 points
 }
 
 module.exports = GameService;
