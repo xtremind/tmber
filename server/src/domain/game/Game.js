@@ -65,7 +65,7 @@ class Game {
   }
 
   isReadyToStart(){
-    return this.#status === State.WAITING && this.#players.length <= this.#difficulty.maxPlayers && this.#players.length > this.#difficulty.minPlayers
+    return this.#status === State.WAITING && this.#players.length <= this.#difficulty.maxPlayers && this.#players.length >= this.#difficulty.minPlayers
   }
 
   start(){

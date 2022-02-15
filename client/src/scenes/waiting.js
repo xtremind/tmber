@@ -155,7 +155,7 @@ class WaitingScene extends Scene {
     const sceneScope = this;
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     if (sceneScope.sys.game.currentGameId === sceneScope.sys.game.currentUuid) {
-      if (typeof sceneScope.startButton == "undefined" && nbPlayers > difficulty.normal.minPlayers ){
+      if (typeof sceneScope.startButton == "undefined" && nbPlayers >= difficulty.normal.minPlayers ){
         sceneScope.startButton = Graphics.drawButton(sceneScope,
           {x: screenCenterX - 200, y: 350, height: 50,width: 200,},
           Styles.hostButton, "start game", Styles.hostText, "start game",
@@ -165,7 +165,7 @@ class WaitingScene extends Scene {
           }
         );
       }
-      if (typeof sceneScope.startButton != "undefined" && nbPlayers <= difficulty.normal.minPlayers){
+      if (typeof sceneScope.startButton != "undefined" && nbPlayers < difficulty.normal.minPlayers){
         sceneScope.startButton.destroy()
         sceneScope.startButton = undefined;
       }
