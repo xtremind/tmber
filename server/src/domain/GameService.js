@@ -145,6 +145,7 @@ class GameService {
     
     this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('draw', {"size": this.#deck.length});
   }
 
   #drawACard(){
@@ -162,6 +163,7 @@ class GameService {
     player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('draw', {"size": this.#deck.length});
     //
     this.#forgetFirstActionListener();
     // next step

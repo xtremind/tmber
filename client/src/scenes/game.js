@@ -44,7 +44,6 @@ class GameScene extends Scene {
     //add background image
     let back = sceneScope.add.image(0, 0, "cardTable").setOrigin(0);
     this.#add('background', back);
-    sceneScope.#showDraw();
   }
 
   #prepareScore(scores){
@@ -144,14 +143,16 @@ class GameScene extends Scene {
     });
   }
 
-  #showDraw(){
+  #showDraw(draw){
     console.log("GameScene.#showDraw");
+    this.#destroyAll('draw');
     var sceneScope = this;
-    this.add.image(this.#centerX - 100, this.#centerY+8, 'cards', 'back')
-    this.add.image(this.#centerX - 96, this.#centerY+4, 'cards', 'back')
-    this.add.image(this.#centerX - 92, this.#centerY, 'cards', 'back')
-    this.add.image(this.#centerX - 88, this.#centerY-4, 'cards', 'back')
-    this.add.image(this.#centerX - 84, this.#centerY-8, 'cards', 'back')
+    let size = Math.floor(draw.size * 5 / 54) ;
+    for(let i = 0; i < size; i++){
+      let image = this.add.image(this.#centerX - (100 - i*4), this.#centerY+ (8 - i*4) , 'cards', 'back')
+      this.#add('draw', image);
+    }
+    let image = this.add.image(this.#centerX - (100 - size*4), this.#centerY+(8 - size*4), 'cards', 'back')
       .setInteractive()
       .addListener('pointerdown',() => {
         if (sceneScope.#currentAction == Action.PICKUP){
@@ -163,6 +164,7 @@ class GameScene extends Scene {
           console.log("bad action"); 
         }
       }) //=> only that one will have a listener
+      this.#add('draw', image);
   }
 
   #showTimberButton(){
@@ -225,6 +227,7 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("cards", cards => sceneScope.#showHand(cards));
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
+    sceneScope.sys.game.socket.on("draw", draw => sceneScope.#showDraw(draw));
     sceneScope.sys.game.socket.on("pick?", () => {
       sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
       sceneScope.#currentAction = Action.PICKUP;

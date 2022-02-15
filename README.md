@@ -69,6 +69,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] compute global score
 - [x] display global score
 - [x] if no more card in draw => computer score
+- [x] render draw depending on the number of cards in it.
 
 ## IN PROGRESS
 
@@ -79,7 +80,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] render draw depending on the number of cards in it.
 - [ ] show error message is present
 - [ ] display current score
 - [ ] "achievement" scene once game has ended
