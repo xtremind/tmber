@@ -70,6 +70,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] display global score
 - [x] if no more card in draw => computer score
 - [x] render draw depending on the number of cards in it.
+- [x] show error message is present
 
 ## IN PROGRESS
 
@@ -80,13 +81,14 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] show error message is present
 - [ ] display current score
-- [ ] "achievement" scene once game has ended
+- [ ] "reward" scene once game has ended
+- [ ] "achievement" once obtain
 - [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
-- [ ] improve how others cards are shown
 - [ ] extra rules : if global score is a multiple to 100 => -50
+- [ ] improve error message => in box
 
+- [ ] (optional) improve how others cards are shown
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
 - [ ] (optional) improve security (answering player == current player)
 - [ ] (optional) choose difficulty

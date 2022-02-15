@@ -112,7 +112,7 @@ class GameScene extends Scene {
       }
 
       //display player's name and score
-      let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name + " (" + this.#scores.get(other.uuid) + ")", Styles.playerNameText).setOrigin(0.5, 0);
+      let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name.substring(0, 15) + " (" + this.#scores.get(other.uuid) + ")", Styles.playerNameText).setOrigin(0.5, 0);
       this.#blink(name, this.#players.get(other.uuid).current);
       this.#add('others', name);
 
@@ -228,15 +228,21 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
     sceneScope.sys.game.socket.on("draw", draw => sceneScope.#showDraw(draw));
-    sceneScope.sys.game.socket.on("pick?", () => {
+    sceneScope.sys.game.socket.on("pick?", (error) => {
       sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
       sceneScope.#currentAction = Action.PICKUP;
       sceneScope.#showHand();
+      if (typeof error != "undefined"){
+        Graphics.showError(sceneScope, error.message);
+      }
     })
-    sceneScope.sys.game.socket.on("discard?", () => {
+    sceneScope.sys.game.socket.on("discard?", (error) => {
       sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
       sceneScope.#currentAction = Action.DISCARD; 
       sceneScope.#showHand();
+      if (typeof error != "undefined"){
+        Graphics.showError(sceneScope, error.message);
+      }
     });
   }
 
