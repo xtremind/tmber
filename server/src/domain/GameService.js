@@ -16,8 +16,6 @@ class GameService {
   #givenCards = new Map();  // players' hands
   #scores = new Map();      // global score
 
-  #players = new Map();      // global score
-
   constructor(io, game, logger) {
     this.#io = io;
     this.#logger = logger;
