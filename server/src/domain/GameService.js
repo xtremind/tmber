@@ -54,6 +54,7 @@ class GameService {
       //is ready
       player.socket().on("ready", () => {
         stateScope.#logger.debug("["+stateScope.#game.id()+"]["+player.uuid()+"] ready");
+        player.socket().removeAllListeners("ready")
         stateScope.#playerReady++;
         if (stateScope.#playerReady == stateScope.#game.players().length) {
           stateScope.#logger.debug("["+stateScope.#game.id()+"] everybody is ready - game start");
@@ -207,7 +208,20 @@ class GameService {
       if(endGame){
         this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
         this.#game.end();
+        //add listener to datas for all players
+        this.#game.players().forEach(player => {
+          if(player.isPlayer()) {
+            player.socket().on("final", () => {
+              // send ranking
+              player.socket().emit("ranks", this.#computeRank())
+              // send reward
+              // send achievement ?
+              player.socket().removeAllListeners("final")
+            })
+          }
+        })
         // end game
+        this.#broadcast('end');
       } else {
         this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
         this.#nextPlay();
@@ -218,6 +232,23 @@ class GameService {
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] invalid timber");
       player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     }
+  }
+
+  #computeRank(){
+    let ranks = this.#game.players().map(p => {
+      return {"name": p.name(), "score": this.#scores.get(p.uuid())}
+    });
+    ranks.sort((a, b) => a.score - b.score)
+
+    let c = 0, r = 0;
+    ranks.map(p => {
+      if (c < p.score){
+        c = p.score;
+        r++;
+      }
+      return Object.assign(p, {"rank": r});
+    })
+    return ranks;
   }
 
   #computeScore(player, scoreTmber){

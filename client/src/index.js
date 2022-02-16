@@ -8,6 +8,7 @@ import PreloadScene from 'scenes/preload';
 import TitleScene from 'scenes/title';
 import WaitingScene from 'scenes/waiting';
 import GameScene from 'scenes/game';
+import EndScene from 'scenes/end';
 
 // Declare configuration
 const config = {
@@ -29,7 +30,8 @@ const config = {
     PreloadScene,
     TitleScene,
     WaitingScene,
-    GameScene
+    GameScene,
+    EndScene
   ]
 };
 

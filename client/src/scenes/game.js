@@ -244,6 +244,26 @@ class GameScene extends Scene {
         Graphics.showError(sceneScope, error.message);
       }
     });
+    sceneScope.sys.game.socket.on("end", () => sceneScope.#goToEndGame());
+  }
+
+  #goToEndGame(){
+    console.log("GameScene.#goToEndGame");
+    this.#removeListeners();
+    this.scene.start('EndScene');
+  }
+
+  #removeListeners(){
+    console.log("GameScene.#removeListeners");
+    this.sys.game.socket.off("players");
+    this.sys.game.socket.off("score");
+    this.sys.game.socket.off("cards");
+    this.sys.game.socket.off("others");
+    this.sys.game.socket.off("discard");
+    this.sys.game.socket.off("draw");
+    this.sys.game.socket.off("pick?");
+    this.sys.game.socket.off("discard?");
+
   }
 
   #add(id, element){
