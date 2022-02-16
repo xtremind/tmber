@@ -199,40 +199,56 @@ class GameService {
     let scoreTmber = this.#computeCurrentScore(this.#givenCards.get(player.uuid()));
     if (this.#validateTimber(scoreTmber)){
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] valid timber");
-      let endGame = this.#computeScore(player, scoreTmber);
-
       this.#forgetFirstActionListener();
-
-      if(endGame){
-        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
-        this.#game.end();
-        //add listener to datas for all players
-        this.#game.players().forEach(player => {
-          if(player.isPlayer()) {
-            player.socket().on("final", () => {
-              // send ranking
-              player.socket().emit("ranks", this.#computeRank())
-              // send reward
-              // send achievement ?
-              player.socket().removeAllListeners("final")
-            })
-          }
-        })
-        // end game
-        this.#broadcast('end');
-      } else {
-        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
-        this.#nextPlay();
-        this.#nextTurn();
-      }
-
+      this.#computeEndPlay(player, scoreTmber);
     } else {
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] invalid timber");
       player.socket().emit('pick?', {'message' : 'bad pick, retry'});
     }
   }
 
+  #computeEndPlay(player, scoreTmber){
+    let result = this.#computeResult(player, scoreTmber);
+    let endGame = this.#computeScore(result);
+    if(endGame){
+      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
+      this.#game.end();
+      this.#game.players().forEach(p => {
+        if(p.isPlayer()) {
+          p.socket().on("final", () => {
+            // send ranking
+            p.socket().emit("ranks", this.#computeRank())
+            // send reward
+            // send achievement ?
+            p.socket().removeAllListeners("final")
+          })
+        }
+      })
+      // end game
+      this.#broadcast('end');
+    } else {
+      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Show current result");
+      //show current result
+      this.#broadcast('result',
+        this.#game.players().map(p => {
+          return {
+            "uuid": p.uuid(), 
+            "name": p.name(), 
+            "result": result.get(p.uuid()), 
+            "cards" : this.#givenCards.get(p.uuid()).map(c => {return {'name': c.filename, 'value': c.value}})};
+        })
+      );
+      //wait a bit before next turn
+      setTimeout(() => {
+        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
+        this.#nextPlay();
+        this.#nextTurn();
+      }, 5000);
+    }
+  }
+
   #computeRank(){
+    this.#logger.debug("["+this.#game.id()+"] compute rank");
     let ranks = this.#game.players().map(p => {
       return {"name": p.name(), "score": this.#scores.get(p.uuid())}
     });
@@ -249,13 +265,14 @@ class GameService {
     return ranks;
   }
 
-  #computeScore(player, scoreTmber){
+  #computeResult(player, scoreTmber){
+    this.#logger.debug("["+this.#game.id()+"] compute result");
     let affectMalus = false;
-    let current = new Map();      // global score
+    let result = new Map();      // global score
     // compute play score
     this.#game.players().forEach(p => {
       let score = this.#computeCurrentScore(this.#givenCards.get(p.uuid()))
-      current.set(p.uuid(), score);
+      result.set(p.uuid(), score);
       this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] score : "+ score);
       if(player.uuid() != p.uuid() && scoreTmber >= score){
         affectMalus = true;
@@ -264,13 +281,17 @@ class GameService {
 
     if(affectMalus){
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] another player has lesser point than the player ");
-      current.set(player.uuid(), current.get(player.uuid()) + this.#game.difficulty().malus);
+      result.set(player.uuid(), result.get(player.uuid()) + this.#game.difficulty().malus);
     }
+    return result;
+  }
 
+  #computeScore(result){
+    this.#logger.debug("["+this.#game.id()+"] compute score");
     let endGame = false;
     // show current play score
     this.#game.players().forEach(p => {
-      let nextScore =  this.#scores.get(p.uuid()) + current.get(p.uuid())
+      let nextScore =  this.#scores.get(p.uuid()) + result.get(p.uuid())
       this.#scores.set(p.uuid(), nextScore)
       this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
 
@@ -336,9 +357,7 @@ class GameService {
         this.#nextTurn()
       } else {
         this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] No more card to play - End Play");
-        this.#computeScore(player, 0)
-        this.#nextPlay();
-        this.#nextTurn();
+        this.#computeEndPlay(player, 0);
       }
     } else {
       player.socket().emit('discard?', {'message' : 'bad selection, retry'});

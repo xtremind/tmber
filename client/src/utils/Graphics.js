@@ -1,3 +1,16 @@
+const drawPopup = function(scene) {
+  var container = scene.add.container();
+
+  var rectangle = scene.add.graphics();
+
+  rectangle.lineStyle(2, 0x0000FF, 1);
+  rectangle.fillStyle(0x027a71, 1);
+  rectangle.fillRoundedRect( 0, 0, scene.cameras.main.width, scene.cameras.main.height, 7);
+  container.add(rectangle);
+
+  return container;
+}
+
 
  const drawButton = function (
   scene,
@@ -121,5 +134,6 @@ export default {
     drawButton,
     del,
     showError,
-    blink
+    blink,
+    drawPopup
 }

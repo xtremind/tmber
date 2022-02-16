@@ -6,7 +6,7 @@
     "startingHand": 5,
     "maxTmber": 7,
     "malus": 25,
-    "endGame": 10,
+    "endGame": 100,
     "extraRules": false
   },
   "hard":

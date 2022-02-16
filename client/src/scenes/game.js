@@ -48,9 +48,7 @@ class GameScene extends Scene {
 
   #prepareScore(scores){
     console.log("GameScene.#prepareScore", scores);
-    var sceneScope = this;
     if (typeof scores == "undefined") return ;
-
     scores.forEach(p => {
       this.#scores.set(p.uuid, p.score);
     });
@@ -60,6 +58,7 @@ class GameScene extends Scene {
     console.log("GameScene.#showHand", cards);
     var sceneScope = this;
     if (typeof cards !== "undefined") this.#hand = cards;
+    this.#destroyAll('resultBoard');
     this.#destroyAll('hand');
     const posX = this.#centerX - ((this.#hand.length - 1) * this.#separateSpace)/2;
     this.#hand.forEach((card, index) => {
@@ -115,9 +114,7 @@ class GameScene extends Scene {
       let name = this.add.text(posX, posY + 100, this.#players.get(other.uuid).name.substring(0, 15) + " (" + this.#scores.get(other.uuid) + ")", Styles.playerNameText).setOrigin(0.5, 0);
       this.#blink(name, this.#players.get(other.uuid).current);
       this.#add('others', name);
-
     }
-
   }
 
   #showDiscard(discard){
@@ -218,6 +215,34 @@ class GameScene extends Scene {
     }
   }
 
+  #showResult(result){
+    console.log("GameScene.#showResult");
+    
+    var resultBoard = Graphics.drawPopup(this);
+    
+    const nbPlayers = result.length;
+    const myIndex = result.findIndex(el => el.uuid == this.sys.game.currentUuid);
+    const angle = ((360 / nbPlayers) * Math.PI) / 180
+
+    for(let i = 0; i < nbPlayers; i++){
+      let player = result[((i + 1 + myIndex) % nbPlayers)]
+      let posX = this.#centerX - 450 * Math.sin(angle*(i+1));
+      let posY = this.#centerY - 20 + 250 * Math.cos(angle*(i+1));
+      
+      //display player's nb cards
+      for( let j = 0; j < player.cards.length; j++){
+        let card =  this.add.image(posX + j * 15, posY, 'cards', player.cards[j].name).setAngle((-Math.floor((player.cards.length * 15)/2)) + j * 15);
+        resultBoard.add(card);
+      }
+
+      //display player's name and result
+      resultBoard.add(this.add.text(posX, posY + 110, player.name, Styles.playerNameText).setOrigin(0.5, 0));
+      resultBoard.add(this.add.text(posX, posY + 140, player.result, Styles.playerNameText).setOrigin(0.5, 0));
+    }
+    
+    this.#add('resultBoard', resultBoard);
+  }
+
   #addListener(){
     console.log("GameScene.#addListener");
     var sceneScope = this;
@@ -228,23 +253,19 @@ class GameScene extends Scene {
     sceneScope.sys.game.socket.on("others", others => sceneScope.#showOthers(others));
     sceneScope.sys.game.socket.on("discard", discarded => sceneScope.#showDiscard(discarded));
     sceneScope.sys.game.socket.on("draw", draw => sceneScope.#showDraw(draw));
-    sceneScope.sys.game.socket.on("pick?", (error) => {
-      sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
-      sceneScope.#currentAction = Action.PICKUP;
-      sceneScope.#showHand();
-      if (typeof error != "undefined"){
-        Graphics.showError(sceneScope, error.message);
-      }
-    })
-    sceneScope.sys.game.socket.on("discard?", (error) => {
-      sceneScope.#blink(sceneScope.#displayedElements.get('background')[0], true);
-      sceneScope.#currentAction = Action.DISCARD; 
-      sceneScope.#showHand();
-      if (typeof error != "undefined"){
-        Graphics.showError(sceneScope, error.message);
-      }
-    });
+    sceneScope.sys.game.socket.on("pick?", error => sceneScope.#doAction(Action.PICKUP, error))
+    sceneScope.sys.game.socket.on("discard?", error => sceneScope.#doAction(Action.DISCARD, error));
+    sceneScope.sys.game.socket.on("result", result => sceneScope.#showResult(result));
     sceneScope.sys.game.socket.on("end", () => sceneScope.#goToEndGame());
+  }
+
+  #doAction(action, error){
+    this.#blink(this.#displayedElements.get('background')[0], true);
+    this.#currentAction = action; 
+    this.#showHand();
+    if (typeof error != "undefined"){
+      Graphics.showError(this, error.message);
+    }
   }
 
   #goToEndGame(){
@@ -263,7 +284,8 @@ class GameScene extends Scene {
     this.sys.game.socket.off("draw");
     this.sys.game.socket.off("pick?");
     this.sys.game.socket.off("discard?");
-
+    this.sys.game.socket.off("result");
+    this.sys.game.socket.off("end");
   }
 
   #add(id, element){

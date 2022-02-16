@@ -4,7 +4,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## DONE
 
-### RELEASE x.x.x
+### RELEASE 0.0.1
 
 - [x] skeleton
 - [x] _webpack_
@@ -73,6 +73,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] show error message is present
 - [x] end game scene
 - [x] show rank in end game scene
+- [x] display current score
 
 ## IN PROGRESS
 
@@ -83,7 +84,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] display current score
 - [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
 - [ ] extra rules : if global score is a multiple to 100 => -50
 - [ ] improve error message => in box
@@ -96,3 +96,5 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
 - [ ] (optional) improve security (answering player == current player)
 - [ ] (optional) choose difficulty
+
+
