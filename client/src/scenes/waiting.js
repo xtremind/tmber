@@ -95,7 +95,7 @@ class WaitingScene extends Scene {
     console.log("WaitingScene.#addListener");
     const sceneScope = this;
     //add listeners
-    sceneScope.sys.game.socket.on("players", function (data) {
+    sceneScope.sys.game.socket.on("players", data => {
       console.log("WaitingScene.#addListeners - refresh list of players in the game");
       sceneScope.#cleanPlayers()
       sceneScope.#cleanBots();
@@ -111,13 +111,13 @@ class WaitingScene extends Scene {
 
     })
 
-    sceneScope.sys.game.socket.on("leave", function (data) {
+    sceneScope.sys.game.socket.on("leave", data => {
       console.log("WaitingScene.create - host player leave party");
       sceneScope.#goToTitle();
     });
     
     sceneScope.sys.game.socket.on("ready?", function (data) {
-      console.log("WaitingScene.create - host player leave party");
+      console.log("WaitingScene.create - go to game");
       sceneScope.#goToGame();
     });
   }

@@ -35,7 +35,11 @@ class GameScene extends Scene {
     this.#centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
     this.#createBoard()
     this.#addListener()
-    this.sys.game.socket.emit('ready');
+    if(this.sys.game.reconnect){
+      this.sys.game.socket.emit('reconnect');
+    } else {
+      this.sys.game.socket.emit('ready');
+    }
   }
 
   #createBoard(){

@@ -34,7 +34,7 @@ class ManagementService {
         currentPlayer.goInGame(bot.inGame());
         this.#players.delete(bot.uuid());
         currentPlayer.socket().join(currentGame.id());
-        currentPlayer.socket().emit('ready?', {"id": currentGame.id(), "hostname": currentGame.hostname()});
+        currentPlayer.socket().emit('ready?', {"id": currentGame.id(), "hostname": currentGame.hostname(), "reconnect": true});
         this.#logger.debug("["+playerId+"] rejoin a running game", data);
       }
     } else {

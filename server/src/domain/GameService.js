@@ -58,9 +58,16 @@ class GameService {
           stateScope.#logger.debug("["+stateScope.#game.id()+"] everybody is ready - game start");
           stateScope.#startGame();
         }
-        // if player reconnect ....
       });
     });
+
+    /*this.#io.on("reconnect", (socket) => {
+      stateScope.#logger.debug("["+stateScope.#game.id()+"]["+socket.id()+"] reconnect");
+      //verify socket is from a known user
+        //send data to display
+        //if user = current user
+          // send action
+    })*/
   }
 
   #askReadiness(){
@@ -85,6 +92,7 @@ class GameService {
 
   #computeNextStartingPlayer(){
     this.#logger.debug("["+this.#game.id()+"] computeNextStartingPlayer");
+    this.#currentPlayer = undefined;
     if ( typeof this.#startingPlayer == "undefined"){
       this.#startingPlayer = 0;
     } else {
@@ -126,7 +134,7 @@ class GameService {
   #computeNextCurrentPlayer(){
     this.#logger.debug("["+this.#game.id()+"] computeNextCurrentPlayer");
     if ( typeof this.#currentPlayer == "undefined"){
-      this.#currentPlayer = 0;
+      this.#currentPlayer = this.#startingPlayer;
     } else {
       this.#currentPlayer = (this.#currentPlayer + 1) % this.#game.players().length ;
     }

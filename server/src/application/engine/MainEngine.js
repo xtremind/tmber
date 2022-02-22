@@ -36,6 +36,15 @@ class MainEngine {
           gameService.start();
         }
       });
+      
+      socket.on("reconnect", (data) => {
+        stateScope.#logger.debug("[MainEngine] reconnect...");
+        //stateScope.#logger.debug("["+stateScope.#game.id()+"]["+socket.id()+"] reconnect");
+        //find corresponding ws, and asks reconnect which will :
+          //send data to display
+          //if user = current user
+            // send action
+      })
       //game scene events
 
       //common events

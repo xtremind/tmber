@@ -92,9 +92,19 @@ class TitleScene extends Scene {
       });
     });
 
-    sceneScope.sys.game.socket.on("ready?", function (data) {
-      console.log("TitleScene.create - host player leave party");
-      sceneScope.#goToGame(data);
+    sceneScope.sys.game.socket.on("ready?", function (party) {
+      console.log("TitleScene.create - reconnect party", party);
+      
+      if(party != null && typeof party != "undefined"){
+        sceneScope.sys.game.reconnect = party.reconnect ? true : false;
+        sceneScope.sys.game.currentGameId = party.id;
+        sceneScope.sys.game.currentHostname = party.hostname;
+      } else {
+        sceneScope.sys.game.reconnect = false;
+      }
+      
+      sceneScope.#goToGame(party);
+
     });
   }
   
@@ -125,7 +135,6 @@ class TitleScene extends Scene {
     this.sys.game.currentHostname = party.hostname;
     this.scene.start('WaitingScene'); 
   }
-
   
   #goToGame(party) {
     console.log("TitleScene.#goToGame - game rejoin " + party.id);
