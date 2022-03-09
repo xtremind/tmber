@@ -1,5 +1,6 @@
 const State = require("./State");
 const difficulty = require('../../../../commons/configuration/difficulties.json')
+const {cards} = require('../../infrastructure/cards/deck.json');
 
 class Game {
 
@@ -8,6 +9,8 @@ class Game {
   #players = [];
   #status = State.WAITING;
   #difficulty = difficulty.normal
+
+  #deck = []                // draw pile
 
   constructor(id, host) {
     this.#id = id;
@@ -78,6 +81,21 @@ class Game {
 
   difficulty(){
     return this.#difficulty;
+  }
+
+  deck(){
+    return this.#deck;
+  }
+  
+  randomizeDeck() {
+    this.#deck = cards.slice();
+    this.#deck.sort(function () { return 0.5 - Math.random() });
+  }
+
+  discard(number) {
+    let card = this.#deck.slice(0, number);
+    this.#deck = this.#deck.slice(number, this.#deck.length);
+    return card;
   }
 }
 

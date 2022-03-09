@@ -1,6 +1,4 @@
 
-const {cards} = require('../infrastructure/cards/deck.json');
-
 class GameService {
 
   #io;
@@ -11,7 +9,6 @@ class GameService {
   #startingPlayer;
   #currentPlayer;
 
-  #deck = []                // draw pile
   #discard = [];            // discarded pile (last played card)
   #givenCards = new Map();  // players' hands
   #scores = new Map();      // global score
@@ -84,7 +81,7 @@ class GameService {
   #nextPlay(){
     this.#logger.debug("["+this.#game.id()+"] prepareNextPlay");
     this.#computeNextStartingPlayer();
-    this.#randomizeDeck();
+    this.#game.randomizeDeck();
     this.#distributeGiven();
     this.#discardOneCard();
     this.#broadcast('score', [...this.#scores.keys() ].map(key => {return {"uuid": key, "score": this.#scores.get(key) }}));
@@ -100,28 +97,20 @@ class GameService {
     }
   }
   
-  #randomizeDeck() {
-    this.#logger.debug("["+this.#game.id()+"] randomizeDeck");
-    this.#deck = cards.slice();
-    this.#deck.sort(function () { return 0.5 - Math.random() });
-  }
-
   #distributeGiven(){
     this.#logger.debug("["+this.#game.id()+"] distributeGiven");
     this.#game.players().forEach(player => {
-      let hand = this.#deck.slice(0, this.#game.difficulty().startingHand);
+      let hand = this.#game.discard(this.#game.difficulty().startingHand);
       hand.sort(function (a, b) {
         return a.rank - b.rank;
       });
       this.#givenCards.set(player.uuid(), hand);
-      this.#deck = this.#deck.slice(this.#game.difficulty().startingHand, this.#deck.length);
     });
   }
 
   #discardOneCard(){
     this.#logger.debug("["+this.#game.id()+"] discardOneCard");
-    this.#discard = this.#deck.slice(0, 1);
-    this.#deck = this.#deck.slice(1, this.#deck.length);
+    this.#discard = this.#game.discard(1);
   }
 
   #nextTurn(){
@@ -152,25 +141,23 @@ class GameService {
     
     this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
-    this.#broadcast('draw', {"size": this.#deck.length});
+    this.#broadcast('draw', {"size": this.#game.deck().length});
   }
 
   #drawACard(){
     let player = this.#game.players()[this.#currentPlayer];
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] draw a card");
     // draw a card
-    var card = this.#deck.slice(0, 1);
+    var card = this.#game.discard(1);
     // add card into hand
     let hand = this.#givenCards.get(player.uuid()).concat(card);
     hand.sort((a, b) => a.rank - b.rank);
     this.#givenCards.set(player.uuid(), hand);
-    // remove card from draw
-    this.#deck = this.#deck.slice(1, this.#deck.length);
     // refresh cards
     player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
-    this.#broadcast('draw', {"size": this.#deck.length});
+    this.#broadcast('draw', {"size": this.#game.deck().length});
     //
     this.#forgetFirstActionListener();
     // next step
@@ -360,7 +347,7 @@ class GameService {
       this.#givenCards.set(player.uuid(), hand)
       //
       this.#forgetSecondActionListener();
-      if(this.#deck.length > 0 ){
+      if(this.#game.deck().length > 0 ){
         this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
         this.#nextTurn()
       } else {
