@@ -6,9 +6,6 @@ class GameService {
   #game;
   #playerReady = 0
 
-  #startingPlayer;
-  #currentPlayer;
-
   #discard = [];            // discarded pile (last played card)
   #givenCards = new Map();  // players' hands
   #scores = new Map();      // global score
@@ -80,21 +77,11 @@ class GameService {
   
   #nextPlay(){
     this.#logger.debug("["+this.#game.id()+"] prepareNextPlay");
-    this.#computeNextStartingPlayer();
+    this.#game.nextStartingPlayer();
     this.#game.randomizeDeck();
     this.#distributeGiven();
     this.#discardOneCard();
     this.#broadcast('score', [...this.#scores.keys() ].map(key => {return {"uuid": key, "score": this.#scores.get(key) }}));
-  }
-
-  #computeNextStartingPlayer(){
-    this.#logger.debug("["+this.#game.id()+"] computeNextStartingPlayer");
-    this.#currentPlayer = undefined;
-    if ( typeof this.#startingPlayer == "undefined"){
-      this.#startingPlayer = 0;
-    } else {
-      this.#startingPlayer = (this.#startingPlayer + 1) % this.#game.players().length ;
-    }
   }
   
   #distributeGiven(){
@@ -122,13 +109,9 @@ class GameService {
   
   #computeNextCurrentPlayer(){
     this.#logger.debug("["+this.#game.id()+"] computeNextCurrentPlayer");
-    if ( typeof this.#currentPlayer == "undefined"){
-      this.#currentPlayer = this.#startingPlayer;
-    } else {
-      this.#currentPlayer = (this.#currentPlayer + 1) % this.#game.players().length ;
-    }
+    this.#game.nextCurrentPlayer()
     //send players
-    this.#broadcast('players', this.#game.players().map(p => {return {"uuid": p.uuid(), "name": p.name(), "current": this.#game.players()[this.#currentPlayer].uuid() == p.uuid()}}));
+    this.#broadcast('players', this.#game.players().map(p => {return {"uuid": p.uuid(), "name": p.name(), "current": this.#game.currentPlayer().uuid() == p.uuid()}}));
   }
 
   #showBoard(){
@@ -145,7 +128,7 @@ class GameService {
   }
 
   #drawACard(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] draw a card");
     // draw a card
     var card = this.#game.discard(1);
@@ -165,7 +148,7 @@ class GameService {
   }
 
   #pickACard(card){ 
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card", card);
     let pickedCard = this.#discard.find(c => c.filename == card.name)
     if(typeof card == "undefined"){
@@ -189,7 +172,7 @@ class GameService {
   }
 
   #timber(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] timber");
     let scoreTmber = this.#computeCurrentScore(this.#givenCards.get(player.uuid()));
     if (this.#validateTimber(scoreTmber)){
@@ -309,7 +292,7 @@ class GameService {
   }
 
   #forgetFirstActionListener(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget First Action Listener");
     player.socket().removeAllListeners("pick")
     player.socket().removeAllListeners("draw")
@@ -317,7 +300,7 @@ class GameService {
   }
 
   #firstAction(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] first action");
     var stateScope = this;
     if(player.isPlayer()){
@@ -332,7 +315,7 @@ class GameService {
   }
 
   #discardCards(cards){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] discard cards", cards);
     // receive discarded cards
     // validate discarded cards
@@ -360,7 +343,7 @@ class GameService {
   }
 
   #validateDiscard(cards){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] validate discard");
     let result = cards.length > 0;
     result = result && cards.every(c1 => this.#givenCards.get(player.uuid()).some(c2 => c1.name == c2.filename)) //player has all discarded card
@@ -373,13 +356,13 @@ class GameService {
   }
 
   #forgetSecondActionListener(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget second Action Listener");
     player.socket().removeAllListeners("discard")
   }
 
   #secondAction(){
-    let player = this.#game.players()[this.#currentPlayer];
+    let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] second action");
     var stateScope = this;
     if(player.isPlayer()){

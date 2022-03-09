@@ -10,6 +10,9 @@ class Game {
   #status = State.WAITING;
   #difficulty = difficulty.normal
 
+  #startingPlayer;
+  #currentPlayer;
+
   #deck = []                // draw pile
 
   constructor(id, host) {
@@ -97,6 +100,28 @@ class Game {
     this.#deck = this.#deck.slice(number, this.#deck.length);
     return card;
   }
+  
+  nextStartingPlayer(){
+    this.#currentPlayer = undefined;
+    if ( typeof this.#startingPlayer == "undefined"){
+      this.#startingPlayer = 0;
+    } else {
+      this.#startingPlayer = (this.#startingPlayer + 1) % this.#players.length ;
+    }
+  }
+
+  currentPlayer(){
+    return this.#players[this.#currentPlayer];
+  }
+
+  nextCurrentPlayer(){
+    if ( typeof this.#currentPlayer == "undefined"){
+      this.#currentPlayer = this.#startingPlayer;
+    } else {
+      this.#currentPlayer = (this.#currentPlayer + 1) % this.#players.length ;
+    }
+  }
+
 }
 
 module.exports = Game;
