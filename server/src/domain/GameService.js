@@ -7,7 +7,6 @@ class GameService {
   #playerReady = 0
 
   #discard = [];            // discarded pile (last played card)
-  //#givenCards = new Map();  // players' hands
   #scores = new Map();      // global score
 
   constructor(io, game, logger) {
@@ -80,7 +79,7 @@ class GameService {
     this.#game.nextStartingPlayer();
     this.#game.randomizeDeck();
     this.#distributeGiven();
-    this.#discardOneCard();
+    this.#discardFirstCard();
     this.#broadcast('score', [...this.#scores.keys() ].map(key => {return {"uuid": key, "score": this.#scores.get(key) }}));
   }
   
@@ -89,8 +88,8 @@ class GameService {
     this.#game.players().forEach(player => player.setHand(this.#game.discard(this.#game.difficulty().startingHand)));
   }
 
-  #discardOneCard(){
-    this.#logger.debug("["+this.#game.id()+"] discardOneCard");
+  #discardFirstCard(){
+    this.#logger.debug("["+this.#game.id()+"] discardFirstCard");
     this.#discard = this.#game.discard(1);
   }
 
@@ -110,12 +109,7 @@ class GameService {
 
   #showBoard(){
     this.#logger.debug("["+this.#game.id()+"] showBoard");
-    this.#game.players().forEach(player => {
-      if(player.isPlayer()) {
-        player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
-      }
-    });
-    
+    this.#game.players().filter(player => player.isPlayer()).forEach(player => player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}})));
     this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('draw', {"size": this.#game.deck().length});
@@ -179,18 +173,18 @@ class GameService {
     if(endGame){
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
       this.#game.end();
-      this.#game.players().forEach(p => {
-        if(p.isPlayer()) {
-          p.socket().on("final", () => {
-            // send ranking
-            p.socket().emit("ranks", this.#computeRank())
-            // send reward
-            // send achievement ?
-            p.socket().removeAllListeners("final")
-          })
-        }
+      this.#game.players().filter(p => p.isPlayer()).forEach(p => {
+        p.socket().on("final", () => {
+          // send ranking
+          p.socket().emit("ranks", this.#computeRank())
+          // send reward
+          // send achievement ?
+          p.socket().removeAllListeners("final")
+        })
       })
-      // end game
+      // show result
+
+      // end game after x time
       this.#broadcast('end');
     } else {
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Show current result");
