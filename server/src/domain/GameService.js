@@ -294,24 +294,13 @@ class GameService {
   #forgetFirstActionListener(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget First Action Listener");
-    player.socket().removeAllListeners("pick")
-    player.socket().removeAllListeners("draw")
-    player.socket().removeAllListeners("tmber")
+    player.forgetFirstAction();
   }
 
   #firstAction(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] first action");
-    var stateScope = this;
-    if(player.isPlayer()){
-      player.socket().on("pick", (card) => stateScope.#pickACard(card));
-      player.socket().on("draw", () => stateScope.#drawACard());
-      player.socket().on("tmber", () => stateScope.#timber());
-
-      player.socket().emit('pick?');
-    } else {
-      //bot
-    }
+    player.chooseFirstAction(this.#pickACard.bind(this), this.#drawACard.bind(this), this.#timber.bind(this));
   }
 
   #discardCards(cards){
@@ -358,20 +347,13 @@ class GameService {
   #forgetSecondActionListener(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] forget second Action Listener");
-    player.socket().removeAllListeners("discard")
+    player.forgetSecondAction();
   }
 
   #secondAction(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] second action");
-    var stateScope = this;
-    if(player.isPlayer()){
-    // ask current player to discard
-      player.socket().on("discard", (cards) => stateScope.#discardCards(cards));
-      player.socket().emit('discard?');
-    } else {
-      //bot
-    }
+    player.chooseSecondAction(this.#discardCards.bind(this));
   }
 }
 
