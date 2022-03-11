@@ -4,7 +4,9 @@ class User {
   #socket = {};       // socket to communicate with player
   #name = ""          // name 
   #isPlayer = null;   // type of user
-  #inGame = undefined;     // id of game where the user is
+  #inGame = undefined;// id of game where the user is
+
+  #hand = []          // cards in hand
 
   constructor(socket, isPlayer) {
     this.#socket = socket;
@@ -46,6 +48,22 @@ class User {
   leaveGame(){
     this.#inGame = undefined;
   }
+
+  hand(){
+    return this.#hand;
+  }
+
+  setHand(cards){
+    this.#hand = cards;
+    
+    this.#hand.sort(function (a, b) {
+      return a.rank - b.rank;
+    });
+  }
+
+  //addCardsInHand
+  //removeCardsFromHand
+  //emptyHand
 
   //addListener, emit, broadcast, joinRoom, emitRoom
 }

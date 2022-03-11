@@ -7,7 +7,7 @@ class GameService {
   #playerReady = 0
 
   #discard = [];            // discarded pile (last played card)
-  #givenCards = new Map();  // players' hands
+  //#givenCards = new Map();  // players' hands
   #scores = new Map();      // global score
 
   constructor(io, game, logger) {
@@ -86,13 +86,7 @@ class GameService {
   
   #distributeGiven(){
     this.#logger.debug("["+this.#game.id()+"] distributeGiven");
-    this.#game.players().forEach(player => {
-      let hand = this.#game.discard(this.#game.difficulty().startingHand);
-      hand.sort(function (a, b) {
-        return a.rank - b.rank;
-      });
-      this.#givenCards.set(player.uuid(), hand);
-    });
+    this.#game.players().forEach(player => player.setHand(this.#game.discard(this.#game.difficulty().startingHand)));
   }
 
   #discardOneCard(){
@@ -118,11 +112,11 @@ class GameService {
     this.#logger.debug("["+this.#game.id()+"] showBoard");
     this.#game.players().forEach(player => {
       if(player.isPlayer()) {
-        player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
+        player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
       }
     });
     
-    this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
+    this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('draw', {"size": this.#game.deck().length});
   }
@@ -133,12 +127,10 @@ class GameService {
     // draw a card
     var card = this.#game.discard(1);
     // add card into hand
-    let hand = this.#givenCards.get(player.uuid()).concat(card);
-    hand.sort((a, b) => a.rank - b.rank);
-    this.#givenCards.set(player.uuid(), hand);
+    player.setHand(player.hand().concat(card))
     // refresh cards
-    player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-    this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
+    player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('draw', {"size": this.#game.deck().length});
     //
@@ -155,14 +147,12 @@ class GameService {
       player.socket().emit('pick?');
     } else {
       // add card into hand
-      let hand = this.#givenCards.get(player.uuid()).concat([pickedCard]);
-      hand.sort((a, b) => a.rank - b.rank);
-      this.#givenCards.set(player.uuid(), hand);
+      player.setHand(player.hand().concat([pickedCard]))
       // remove card from discard
       this.#discard = this.#discard.filter(c => c.filename != pickedCard.filename)
       // refresh cards
-      player.socket().emit('cards', this.#givenCards.get(player.uuid()).map(c => {return {'name': c.filename, 'value': c.value}}));
-      this.#broadcast('others', [...this.#givenCards.keys()].map(key => {return {"uuid": key, "nb": this.#givenCards.get(key).length }}) );
+      player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
+      this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
       this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
       //
       this.#forgetFirstActionListener();
@@ -174,7 +164,7 @@ class GameService {
   #timber(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] timber");
-    let scoreTmber = this.#computeCurrentScore(this.#givenCards.get(player.uuid()));
+    let scoreTmber = this.#computeCurrentScore(player.hand());
     if (this.#validateTimber(scoreTmber)){
       this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] valid timber");
       this.#forgetFirstActionListener();
@@ -213,7 +203,7 @@ class GameService {
             "uuid": p.uuid(), 
             "name": p.name(), 
             "result": result.get(p.uuid()), 
-            "cards" : this.#givenCards.get(p.uuid()).map(c => {return {'name': c.filename, 'value': c.value}})};
+            "cards" : p.hand().map(c => {return {'name': c.filename, 'value': c.value}})};
         })
       );
       //wait a bit before next turn
@@ -249,7 +239,7 @@ class GameService {
     let result = new Map();      // global score
     // compute play score
     this.#game.players().forEach(p => {
-      let score = this.#computeCurrentScore(this.#givenCards.get(p.uuid()))
+      let score = this.#computeCurrentScore(p.hand())
       result.set(p.uuid(), score);
       this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] score : "+ score);
       if(player.uuid() != p.uuid() && scoreTmber >= score){
@@ -310,13 +300,13 @@ class GameService {
     // validate discarded cards
     if(this.#validateDiscard(cards)){
       //the cards 
-      let discarded = this.#givenCards.get(player.uuid()).filter(card => cards.some(c => c.name == card.filename));
+      let discarded = player.hand().filter(card => cards.some(c => c.name == card.filename));
       // discarded to discard pile
       this.#discard = discarded;
       // update player hand
-      let hand = this.#givenCards.get(player.uuid())
+      let hand = player.hand()
       discarded.forEach(card => hand = hand.filter(c => c.filename != card.filename))
-      this.#givenCards.set(player.uuid(), hand)
+      player.setHand(hand)
       //
       this.#forgetSecondActionListener();
       if(this.#game.deck().length > 0 ){
@@ -335,8 +325,8 @@ class GameService {
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] validate discard");
     let result = cards.length > 0;
-    result = result && cards.every(c1 => this.#givenCards.get(player.uuid()).some(c2 => c1.name == c2.filename)) //player has all discarded card
-    let discarded = this.#givenCards.get(player.uuid()).filter(card => cards.some(c => c.name == card.filename));
+    result = result && cards.every(c1 => player.hand().some(c2 => c1.name == c2.filename)) //player has all discarded card
+    let discarded = player.hand().filter(card => cards.some(c => c.name == card.filename));
     result = result && (
       (discarded.length >= 3 && discarded.every( (element, index) => index == 0 ? true : (element.rank == discarded[index-1].rank+1 && element.suit == discarded[index-1].suit)  )) || // at least 3 consecutive cards with same suits
       discarded.every( (element, index) => index == 0 ? true : element.rank == discarded[index-1].rank ));      // card with same values
