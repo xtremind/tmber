@@ -121,17 +121,19 @@ class GameService {
     this.#broadcast('draw', {"size": this.#game.deck().length});
   }
 
+
+  #updateHand(player, card){
+    // add card into hand
+    player.setHand(player.hand().concat(card))
+    // refresh board
+    player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
+  }
+
   #drawACard(){
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] draw a card");
-    // draw a card
-    var card = this.#game.discard(1);
-    // add card into hand
-    player.setHand(player.hand().concat(card))
-    // refresh cards
-    player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
-    this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
-    this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
+    this.#updateHand(player, this.#game.discard(1));
     this.#broadcast('draw', {"size": this.#game.deck().length});
     //
     this.#forgetFirstActionListener();
@@ -142,17 +144,13 @@ class GameService {
   #pickACard(card){ 
     let player = this.#game.currentPlayer();
     this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] pick a card", card);
-    let pickedCard = this.#discard.find(c => c.filename == card.name)
     if(typeof card == "undefined"){
       player.socket().emit('pick?');
     } else {
-      // add card into hand
-      player.setHand(player.hand().concat([pickedCard]))
+      let pickedCard = this.#discard.find(c => c.filename == card.name)
+      this.#updateHand(player, [pickedCard]);
       // remove card from discard
       this.#discard = this.#discard.filter(c => c.filename != pickedCard.filename)
-      // refresh cards
-      player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
-      this.#broadcast('others', this.#game.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
       this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
       //
       this.#forgetFirstActionListener();
