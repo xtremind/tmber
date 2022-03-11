@@ -71,7 +71,6 @@ class GameService {
     this.#logger.debug("["+this.#game.id()+"] startGame");
     this.#broadcast('players', this.#game.players().map(p => {return {"uuid": p.uuid(), "name": p.name()}}));
     this.#nextPlay();
-    this.#nextTurn();
   }
   
   #nextPlay(){
@@ -81,6 +80,7 @@ class GameService {
     this.#distributeGiven();
     this.#discardFirstCard();
     this.#broadcast('score', [...this.#scores.keys() ].map(key => {return {"uuid": key, "score": this.#scores.get(key) }}));
+    this.#nextTurn();
   }
   
   #distributeGiven(){
@@ -169,42 +169,37 @@ class GameService {
 
   #computeEndPlay(player, scoreTmber){
     let result = this.#computeResult(player, scoreTmber);
-    let endGame = this.#computeScore(result);
-    if(endGame){
-      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] End Game");
-      this.#game.end();
-      this.#game.players().filter(p => p.isPlayer()).forEach(p => {
-        p.socket().on("final", () => {
-          // send ranking
-          p.socket().emit("ranks", this.#computeRank())
-          // send reward
-          // send achievement ?
-          p.socket().removeAllListeners("final")
-        })
+    this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Show current result");
+    //show current result
+    this.#broadcast('result',
+      this.#game.players().map(p => {
+        return {
+          "uuid": p.uuid(), 
+          "name": p.name(), 
+          "result": result.get(p.uuid()), 
+          "cards" : p.hand().map(c => {return {'name': c.filename, 'value': c.value}})};
       })
-      // show result
+    );
 
-      // end game after x time
-      this.#broadcast('end');
-    } else {
-      this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Show current result");
-      //show current result
-      this.#broadcast('result',
-        this.#game.players().map(p => {
-          return {
-            "uuid": p.uuid(), 
-            "name": p.name(), 
-            "result": result.get(p.uuid()), 
-            "cards" : p.hand().map(c => {return {'name': c.filename, 'value': c.value}})};
-        })
-      );
-      //wait a bit before next turn
-      setTimeout(() => {
-        this.#logger.debug("["+this.#game.id()+"]["+player.uuid() +"] Next Play");
-        this.#nextPlay();
-        this.#nextTurn();
-      }, 5000);
-    }
+    setTimeout(() => this.#computeScore(result) ? this.#computeEndGame() : this.#nextPlay(), 5000);
+  }
+
+  #computeEndGame(){
+    this.#logger.debug("["+this.#game.id()+"] End Game");
+    this.#game.end();
+    const ranks = this.#computeRank();
+    this.#game.players().filter(player => player.isPlayer()).forEach(player => {
+      player.socket().on("final", () => {
+        // send ranking
+        player.socket().emit("ranks", ranks)
+        // send reward
+        // send achievement ?
+        // stop listening
+        player.socket().removeAllListeners("final")
+      })
+    })
+    // end game after x time
+    this.#broadcast('end');
   }
 
   #computeRank(){
