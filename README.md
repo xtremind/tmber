@@ -77,6 +77,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## IN PROGRESS
 
+- [ ] bot first step
 
 ## BLOCKED
 

@@ -1,4 +1,5 @@
 const User = require('./User');
+const Strategy = require('../strategy/Strategy');
 
 class Bot extends User {
   constructor() {
@@ -13,6 +14,9 @@ class Bot extends User {
   chooseFirstAction(pick, draw, timber){
     //choose action between pick, draw, timber
     console.log("bot.chooseFirstAction")
+    setTimeout(() => {
+        Strategy.chooseAction(this.hand(), pick, draw, timber);
+      }, 500);
   }
 
   forgetFirstAction(){
@@ -22,11 +26,21 @@ class Bot extends User {
   chooseSecondAction(discard){
     console.log("bot.chooseSecondAction")
     //define which cards to discard
-    //discard(cards);
+    setTimeout(() => Strategy.discard(this.hand(), discard), 500);
+
   }
 
   forgetSecondAction(){
     console.log("bot.forgetSecondAction")
+  }
+
+  //mock socket
+  socket(){
+    return {
+      emit: () => {return;},
+      on: () => {return;},
+      removeAllListeners: () => {return;}
+    };
   }
 }
 
