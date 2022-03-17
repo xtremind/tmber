@@ -28,11 +28,12 @@ const logger = createLogger({
 //
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
-if (process.env.NODE_ENV !== "production") {
+
+//if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV == "production") {
   logger.add(new transports.Console({ level: "debug" }));
 } else {
-  logger.add(new transports.Console({ level: "info" }));
+  logger.add(new transports.Console({ level: "debug" }));
   logger.add(new transports.File({ filename: "error.log", level: "error" }));
   logger.add(new transports.File({ filename: "combined.log" }));
 }
