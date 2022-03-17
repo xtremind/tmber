@@ -175,7 +175,7 @@ class GameScene extends Scene {
 
     if(sceneScope.#currentAction == Action.PICKUP && this.#hand.reduce((p, c) => p + c.value, 0) <= difficulty.normal.maxTmber){
       let tmberButton = Graphics.drawButton(sceneScope,
-        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
+        {x: this.#centerX - 160, y: this.cameras.main.height - 275, height: 50, width: 150,},
         Styles.hostButton, "tmber", Styles.hostText, "tmber",
         () => {
           console.log("GameScene.#showTimberButton");
@@ -201,7 +201,7 @@ class GameScene extends Scene {
     //if at least 1 selected, display discard button
     if(this.#hand.some(card => card.selected) && sceneScope.#currentAction == Action.DISCARD){
       let discardButton = Graphics.drawButton(sceneScope,
-        {x: this.#centerX - 75, y: this.cameras.main.height - 275, height: 50, width: 150,},
+        {x: this.#centerX + 10, y: this.cameras.main.height - 275, height: 50, width: 150,},
         Styles.hostButton, "discard", Styles.hostText, "discard",
         () => {
           console.log("GameScene.#showDiscardButton - discard");
