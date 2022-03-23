@@ -14,6 +14,7 @@ class Game {
   #currentPlayer;
 
   #deck = []                // draw pile
+  #scores= new Map();
 
   constructor(id, host) {
     this.#id = id;
@@ -122,6 +123,9 @@ class Game {
     }
   }
 
+  scores(){
+    return this.#scores;
+  }
 }
 
 module.exports = Game;

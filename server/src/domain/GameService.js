@@ -7,7 +7,6 @@ class GameService {
   #playerReady = 0
 
   #discard = [];            // discarded pile (last played card)
-  #scores = new Map();      // global score
 
   constructor(io, game, logger) {
     this.#io = io;
@@ -29,7 +28,7 @@ class GameService {
 
   #initiateScore(){
     this.#logger.debug("["+this.#game.id()+"] initiateScore");
-    this.#game.players().forEach(p => this.#scores.set(p.uuid(), 0))
+    this.#game.players().forEach(p => this.#game.scores().set(p.uuid(), 0))
   }
 
   #setEventHandlers(){
@@ -79,7 +78,7 @@ class GameService {
     this.#game.randomizeDeck();
     this.#distributeGiven();
     this.#discardFirstCard();
-    this.#broadcast('score', [...this.#scores.keys() ].map(key => {return {"uuid": key, "score": this.#scores.get(key) }}));
+    this.#broadcast('score', [...this.#game.scores().keys() ].map(key => {return {"uuid": key, "score": this.#game.scores().get(key) }}));
     this.#nextTurn();
   }
   
@@ -114,7 +113,6 @@ class GameService {
     this.#broadcast('discard', this.#discard.map(c => {return {'name': c.filename, 'value': c.value}}));
     this.#broadcast('draw', {"size": this.#game.deck().length});
   }
-
 
   #updateHand(player, card){
     // add card into hand
@@ -205,7 +203,7 @@ class GameService {
   #computeRank(){
     this.#logger.debug("["+this.#game.id()+"] compute rank");
     let ranks = this.#game.players().map(p => {
-      return {"name": p.name(), "score": this.#scores.get(p.uuid())}
+      return {"name": p.name(), "score": this.#game.scores().get(p.uuid())}
     });
     ranks.sort((a, b) => a.score - b.score)
 
@@ -246,8 +244,8 @@ class GameService {
     let endGame = false;
     // show current play score
     this.#game.players().forEach(p => {
-      let nextScore =  this.#scores.get(p.uuid()) + result.get(p.uuid())
-      this.#scores.set(p.uuid(), nextScore)
+      let nextScore =  this.#game.scores().get(p.uuid()) + result.get(p.uuid())
+      this.#game.scores().set(p.uuid(), nextScore)
       this.#logger.debug("["+this.#game.id()+"]["+p.uuid() +"] nextScore : "+ nextScore);
 
         // if nobody has more than 100 point

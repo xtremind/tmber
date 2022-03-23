@@ -77,6 +77,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## IN PROGRESS
 
+- [ ] refacto code
 - [ ] bot first step
 
 ## BLOCKED
@@ -86,10 +87,13 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 ## TODO
 
 - [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
+- [ ] when displaying current score, blink player who's called tmber
+- [ ] add scene Rules / Help
+- [ ] add button to main menu from end game scene
+- [ ] add "leave" button in Game Scene, that will forbid to reconnect when refreshing the page
 - [ ] extra rules : if global score is a multiple to 100 => -50
 - [ ] improve error message => in box
 - [ ] improve end game scene => a box for each part
-- [ ] add button to main menu from end game scene
 
 - [ ] (optional) "reward" scene once game has ended
 - [ ] (optional) "achievement" once obtain
@@ -97,5 +101,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [ ] (optional) adding intermediary scene to change name between "title" and "waiting" scene
 - [ ] (optional) improve security (answering player == current player)
 - [ ] (optional) choose difficulty
+
 
 
