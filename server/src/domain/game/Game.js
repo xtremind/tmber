@@ -130,6 +130,23 @@ class Game {
   initiateScore(){
     this.#players.forEach(p => this.#scores.set(p.uuid(), 0))
   }
+  
+  computeRank(){
+    let ranks = this.#players.map(p => {
+      return {"name": p.name(), "score": this.#scores.get(p.uuid())}
+    });
+    ranks.sort((a, b) => a.score - b.score)
+
+    let c = 0, r = 0;
+    ranks.map(p => {
+      if (c < p.score){
+        c = p.score;
+        r++;
+      }
+      return Object.assign(p, {"rank": r});
+    })
+    return ranks;
+  }
 }
 
 module.exports = Game;

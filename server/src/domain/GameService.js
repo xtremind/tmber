@@ -180,7 +180,7 @@ class GameService {
   #computeEndGame(){
     this.#logger.debug("["+this.#game.id()+"] End Game");
     this.#game.end();
-    const ranks = this.#computeRank();
+    const ranks = this.#game.computeRank();
     this.#game.players().filter(player => player.isPlayer()).forEach(player => {
       player.socket().on("final", () => {
         // send ranking
@@ -193,24 +193,6 @@ class GameService {
     })
     // end game after x time
     this.#broadcast('end');
-  }
-
-  #computeRank(){
-    this.#logger.debug("["+this.#game.id()+"] compute rank");
-    let ranks = this.#game.players().map(p => {
-      return {"name": p.name(), "score": this.#game.scores().get(p.uuid())}
-    });
-    ranks.sort((a, b) => a.score - b.score)
-
-    let c = 0, r = 0;
-    ranks.map(p => {
-      if (c < p.score){
-        c = p.score;
-        r++;
-      }
-      return Object.assign(p, {"rank": r});
-    })
-    return ranks;
   }
 
   #computeResult(player, scoreTmber){
