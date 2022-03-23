@@ -16,7 +16,7 @@ class GameService {
 
   start(){
     this.#logger.debug("["+this.#game.id()+"] starting...");
-    this.#initiateScore();
+    this.#game.initiateScore();
     this.#setEventHandlers();
     this.#askReadiness()
     this.#logger.debug("["+this.#game.id()+"] started");
@@ -24,11 +24,6 @@ class GameService {
 
   #broadcast(message, content){
     return this.#io.to(this.#game.id()).emit(message, content);;
-  }
-
-  #initiateScore(){
-    this.#logger.debug("["+this.#game.id()+"] initiateScore");
-    this.#game.players().forEach(p => this.#game.scores().set(p.uuid(), 0))
   }
 
   #setEventHandlers(){

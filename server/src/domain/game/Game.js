@@ -126,6 +126,10 @@ class Game {
   scores(){
     return this.#scores;
   }
+
+  initiateScore(){
+    this.#players.forEach(p => this.#scores.set(p.uuid(), 0))
+  }
 }
 
 module.exports = Game;
