@@ -86,6 +86,8 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
+
+- [ ] improve displayed de carte restantes => afficher nb cartes ? 1 carte affiché pour 5 cartes restantes ?
 - [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
 - [ ] when displaying current score, blink player who's called tmber
 - [ ] add scene Rules / Help
