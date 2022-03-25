@@ -1,5 +1,4 @@
 const ManagementService = require("../../domain/ManagementService");
-const GameService = require("../../domain/GameService");
 
 class MainEngine {
   #io;
@@ -9,7 +8,7 @@ class MainEngine {
   constructor(io, logger) {
     this.#io = io;
     this.#logger = logger;
-    this.#managementService = new ManagementService(logger);
+    this.#managementService = new ManagementService(logger, io);
   }
 
   #setEventHandlers() {
@@ -29,13 +28,7 @@ class MainEngine {
       socket.on("add bot", (data) => stateScope.#managementService.addBot(socket.id, data));
       socket.on("remove bot", (data) => stateScope.#managementService.removeBot(socket.id, data));
       socket.on("leave", (data) => stateScope.#managementService.leave(socket.id, data));
-      socket.on("start", (data) => {
-        const startedGame = stateScope.#managementService.start(socket.id, data);
-        if (typeof startedGame != "undefined") {
-          var gameService = new GameService(stateScope.#io, startedGame, this.#logger);
-          gameService.start();
-        }
-      });
+      socket.on("start", (data) => stateScope.#managementService.start(socket.id, data));
       
       socket.on("reconnect", (data) => {
         stateScope.#logger.debug("[MainEngine] reconnect...");

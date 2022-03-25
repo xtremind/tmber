@@ -7,11 +7,13 @@ const { v4: uuidv4 } = require("uuid");
 class ManagementService {
 
   #logger;
+  #io;
   #players = new Map();
   #games = new Map();
 
-  constructor(logger) {
+  constructor(logger, io) {
     this.#logger = logger;
+    this.#io = io;
   }
 
   connect(socket) {
@@ -61,7 +63,7 @@ class ManagementService {
     var currentPlayer = this.#players.get(playerId);
     currentPlayer.setName(data.name);
     //create a game and add the player as host
-    var currentGame = new Game(currentPlayer.uuid(), currentPlayer);
+    var currentGame = new Game(currentPlayer.uuid(), currentPlayer, this.#logger, this.#io);
     this.#games.set(currentGame.id(), currentGame);
     currentPlayer.goInGame(currentGame.id());
     //join created game
@@ -160,7 +162,6 @@ class ManagementService {
         //prepare game
         currentGame.start();
         currentPlayer.socket().broadcast.emit("games", this.#waitingGames().map((g) => {return {"id": g.id()}}));
-        return currentGame;
       } else {
         this.#logger.debug("["+playerId+"] game cannot be started yet");
       }

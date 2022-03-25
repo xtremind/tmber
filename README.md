@@ -75,10 +75,10 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] show rank in end game scene
 - [x] display current score
 - [x] empty draw
+- [x] refacto code
 
 ## IN PROGRESS
 
-- [ ] refacto code
 - [ ] bot first step
 
 ## BLOCKED
