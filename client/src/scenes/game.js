@@ -148,6 +148,8 @@ class GameScene extends Scene {
     console.log("GameScene.#showDraw");
     this.#destroyAll('draw');
     var sceneScope = this;
+    if (draw.size == 0)
+      return;
     let size = Math.floor(draw.size * 5 / 54) ;
     for(let i = 0; i < size; i++){
       let image = this.add.image(this.#centerX - (100 - i*4), this.#centerY+ (8 - i*4) , 'cards', 'back')
