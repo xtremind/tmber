@@ -1,4 +1,5 @@
 const State = require("./State");
+const Action = require('../../../../commons/entities/Action')
 const difficulty = require('../../../../commons/configuration/difficulties.json')
 const {cards} = require('../../infrastructure/cards/deck.json');
 
@@ -16,6 +17,7 @@ class Game {
   #playerReady = 0;
   #startingPlayer;
   #currentPlayer;
+  #currentAction = Action.WAIT;
 
   #deck = []                // draw pile
   #scores= new Map();
@@ -195,10 +197,6 @@ class Game {
     return this.#playerReady == this.players().length
   }
 
-
-
-
-
   start(){
     this.#status = State.RUNNING;
     this.#logger.debug("["+this.id()+"] starting...");
@@ -230,13 +228,6 @@ class Game {
       });
     });
 
-    /*this.#io.on("reconnect", (socket) => {
-      stateScope.#logger.debug("["+stateScope.id()+"]["+socket.id()+"] reconnect");
-      //verify socket is from a known user
-        //send data to display
-        //if user = current user
-          // send action
-    })*/
   }
 
   #askReadiness(){
@@ -261,6 +252,7 @@ class Game {
   
   #nextTurn(){
     this.#logger.debug("["+this.id()+"] nextTurn");
+    this.#currentAction = Action.WAIT;
     this.#computeNextCurrentPlayer();
     this.#showBoard();
     this.#firstAction();
@@ -292,6 +284,7 @@ class Game {
   #drawACard(){
     let player = this.currentPlayer();
     this.#logger.debug("["+this.id()+"]["+player.uuid() +"] draw a card");
+    this.#currentAction = Action.PICKUP;
     this.#updateHand(player, this.discard(1));
     this.#broadcast('draw', {"size": this.deck().length});
     //
@@ -306,6 +299,7 @@ class Game {
     if(typeof card == "undefined"){
       player.socket().emit('pick?');
     } else {
+      this.#currentAction = Action.PICKUP;
       let pickedCard = this.discards().find(c => c.filename == card.name)
       this.#updateHand(player, [pickedCard]);
       // remove card from discard
@@ -324,6 +318,7 @@ class Game {
     let scoreTmber = this.#computeCurrentScore(player.hand());
     if (this.#validateTimber(scoreTmber)){
       this.#logger.debug("["+this.id()+"]["+player.uuid() +"] valid timber");
+      this.#currentAction = Action.TIMBER;
       this.#forgetFirstActionListener();
       this.#computeEndPlay(player, scoreTmber);
     } else {
@@ -433,6 +428,7 @@ class Game {
     // receive discarded cards
     // validate discarded cards
     if(this.#validateDiscard(cards)){
+      this.#currentAction = Action.DISCARD;
       //the cards 
       let discarded = player.hand().filter(card => cards.some(c => c.name == card.filename));
       // discarded to discard pile
@@ -480,6 +476,39 @@ class Game {
     player.chooseSecondAction(this.#discardCards.bind(this));
   }
 
+  reconnect(player){
+    this.#logger.debug("["+this.id()+"]["+player.uuid() +"] reconnecting ...");
+    player.socket().emit('players', this.players().map(p => {return {"uuid": p.uuid(), "name": p.name(), "current": this.currentPlayer().uuid() == p.uuid()}}));
+    player.socket().emit('score', [...this.scores().keys() ].map(key => {return {"uuid": key, "score": this.scores().get(key) }}));
+    player.socket().emit('cards', player.hand().map(c => {return {'name': c.filename, 'value': c.value}}));
+    player.socket().emit('others', this.players().map(player => {return {"uuid": player.uuid(), "nb": player.hand().length }}) );
+    player.socket().emit('discard', this.discards().map(c => {return {'name': c.filename, 'value': c.value}}));
+    player.socket().emit('draw', {"size": this.deck().length});
+    
+    if(player.uuid() == this.currentPlayer().uuid()){
+      this.#logger.debug("["+this.id()+"]["+player.uuid() +"] send action");
+      switch (this.#currentAction) {
+        case Action.WAIT:
+          //if 1er step player.chooseFirstAction(this.#pickACard.bind(this), this.#drawACard.bind(this), this.#timber.bind(this));
+          this.#firstAction();
+          break;
+        case Action.PICKUP:
+          //if 2em step player.chooseSecondAction(this.#discardCards.bind(this));
+          this.#secondAction();
+          break;
+        case Action.TIMBER:
+          //...
+          break;
+        case Action.DISCARD:
+          //...
+          break;
+        default:
+          break;
+      }
+    }
+
+    this.#logger.debug("["+this.id()+"]["+player.uuid() +"] reconnected");
+  }
 
 }
 

@@ -37,7 +37,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] scene "game"
 - [x] start game
 - [x] disconnect a known player inside a running game by replacing by a bot
-- [x] reconnect a known player to a running game
 - [x] end game when last player disconnect
 - [x] don't allow a unknown player to join a running game
 - [x] git tag => template for multiplayer
@@ -76,6 +75,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] display current score
 - [x] empty draw
 - [x] refacto code
+- [x] reconnect a known player to a running game
 
 ## IN PROGRESS
 
@@ -87,8 +87,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-
-- [ ] improve reconnect a player (actually : no players' name, and update only when turn change)
 - [ ] when displaying current score, blink player who's called tmber
 - [ ] add scene Rules / Help
 - [ ] add button to main menu from end game scene

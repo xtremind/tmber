@@ -27,14 +27,15 @@ class ManagementService {
     currentPlayer.setUuid(data.uuid);
     currentPlayer.setName(data.name);
 
-    var bot = this.#players.get(currentPlayer.uuid());
-    if (typeof bot !== "undefined"  && !bot.isPlayer()){
-      var currentGame = this.#games.get(bot.inGame());
+    var oldUser = this.#players.get(currentPlayer.uuid());
+    if (typeof oldUser !== "undefined"  && !oldUser.isPlayer()){
+      var currentGame = this.#games.get(oldUser.inGame());
       
       if (typeof currentGame !== "undefined" && currentGame.status() == State.RUNNING) {
-        currentGame.replace(bot, currentPlayer);
-        currentPlayer.goInGame(bot.inGame());
-        this.#players.delete(bot.uuid());
+        currentGame.replace(oldUser, currentPlayer);
+        currentPlayer.goInGame(oldUser.inGame());
+        currentPlayer.setHand(oldUser.hand());
+        this.#players.delete(oldUser.uuid());
         currentPlayer.socket().join(currentGame.id());
         currentPlayer.socket().emit('ready?', {"id": currentGame.id(), "hostname": currentGame.hostname(), "reconnect": true});
         this.#logger.debug("["+playerId+"] rejoin a running game", data);
@@ -171,6 +172,20 @@ class ManagementService {
     return;
   }
 
+  reconnect(playerId){
+    this.#logger.debug("["+playerId+"] reconnecting...");
+    // get player 
+    var currentPlayer = this.#players.get(playerId);
+    //find game if he is in one
+    var currentGame = this.#games.get(currentPlayer.inGame());
+    //stateScope.#logger.debug("["+stateScope.#game.id()+"]["+socket.id()+"] reconnect");
+    currentGame.reconnect(currentPlayer);
+    //find corresponding ws, and asks reconnect which will :
+      //send data to display
+      //if user = current user
+        // send action
+  }
+
   disconnect(playerId) {
     this.#logger.debug("["+playerId+"] disconnecting...");
     // get player 
@@ -244,10 +259,12 @@ class ManagementService {
       
       bot.setUuid(player.uuid());
       bot.goInGame(game.id());
+      bot.setHand(player.hand());
       this.#players.set(bot.uuid(), bot);
       this.#players.delete(playerId);
       
       game.replace(player, bot);
+      game.reconnect(bot);
     } else {
       this.#logger.debug("["+playerId+"] leave running game that has no players");
       // else, we stop the game
