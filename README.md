@@ -76,6 +76,7 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 - [x] empty draw
 - [x] refacto code
 - [x] reconnect a known player to a running game
+- [x] when displaying current score, blink player who's called tmber
 
 ## IN PROGRESS
 
@@ -87,7 +88,6 @@ https://fr.wikipedia.org/wiki/Yaniv_(jeu_de_cartes)
 
 ## TODO
 
-- [ ] when displaying current score, blink player who's called tmber
 - [ ] add scene Rules / Help
 - [ ] add button to main menu from end game scene
 - [ ] add "leave" button in Game Scene, that will forbid to reconnect when refreshing the page

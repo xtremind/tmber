@@ -226,12 +226,12 @@ class GameScene extends Scene {
     
     var resultBoard = Graphics.drawPopup(this);
     
-    const nbPlayers = result.length;
-    const myIndex = result.findIndex(el => el.uuid == this.sys.game.currentUuid);
+    const nbPlayers = result.scores.length;
+    const myIndex = result.scores.findIndex(el => el.uuid == this.sys.game.currentUuid);
     const angle = ((360 / nbPlayers) * Math.PI) / 180
 
     for(let i = 0; i < nbPlayers; i++){
-      let player = result[((i + 1 + myIndex) % nbPlayers)]
+      let player = result.scores[((i + 1 + myIndex) % nbPlayers)]
       let posX = this.#centerX - 450 * Math.sin(angle*(i+1));
       let posY = this.#centerY - 20 + 250 * Math.cos(angle*(i+1));
       
@@ -242,9 +242,21 @@ class GameScene extends Scene {
       }
 
       //display player's name and result
-      resultBoard.add(this.add.text(posX, posY + 110, player.name, Styles.playerNameText).setOrigin(0.5, 0));
-      resultBoard.add(this.add.text(posX, posY + 140, player.result, Styles.playerNameText).setOrigin(0.5, 0));
+      let name = this.add.text(posX, posY + 110, player.name, Styles.playerNameText).setOrigin(0.5, 0)
+      let score = this.add.text(posX, posY + 140, player.result, Styles.playerNameText).setOrigin(0.5, 0)
+
+      //if player tmber, blink
+      if(player.tmber){
+        this.#blink(name, true)
+        this.#blink(score, true)
+      }
+
+      resultBoard.add(name);
+      resultBoard.add(score);
+
     }
+
+    //add sound
     
     this.#add('resultBoard', resultBoard);
   }

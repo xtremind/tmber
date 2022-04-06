@@ -330,18 +330,23 @@ class Game {
   #computeEndPlay(player, scoreTmber){
     let result = this.#computeResult(player, scoreTmber);
     this.#logger.debug("["+this.id()+"]["+player.uuid() +"] Show current result");
-    //show current result
-    this.#broadcast('result',
-      this.players().map(p => {
-        return {
-          "uuid": p.uuid(), 
-          "name": p.name(), 
-          "result": result.get(p.uuid()), 
-          "cards" : p.hand().map(c => {return {'name': c.filename, 'value': c.value}})};
-      })
-    );
 
-    setTimeout(() => this.#computeScore(result) ? this.#computeEndGame() : this.#nextPlay(), 5000);
+    let data = {}
+    data.scores = this.players().map(p => {
+      return {
+        "uuid": p.uuid(), 
+        "name": p.name(),
+        "tmber": player.uuid() == p.uuid(),
+        "result": result.scores.get(p.uuid()), 
+        "cards" : p.hand().map(c => {return {'name': c.filename, 'value': c.value}})};
+    })
+
+    data.success = result.success;
+
+    //show current result
+    this.#broadcast('result', data);
+
+    setTimeout(() => this.#computeScore(result.scores) ? this.#computeEndGame() : this.#nextPlay(), 5000);
   }
 
   #computeEndGame(){
@@ -365,11 +370,11 @@ class Game {
   #computeResult(player, scoreTmber){
     this.#logger.debug("["+this.id()+"] compute result");
     let affectMalus = false;
-    let result = new Map();      // global score
+    let scores = new Map();      // global score
     // compute play score
     this.players().forEach(p => {
       let score = this.#computeCurrentScore(p.hand())
-      result.set(p.uuid(), score);
+      scores.set(p.uuid(), score);
       this.#logger.debug("["+this.id()+"]["+p.uuid() +"] score : "+ score);
       if(player.uuid() != p.uuid() && scoreTmber >= score){
         affectMalus = true;
@@ -378,9 +383,9 @@ class Game {
 
     if(affectMalus){
       this.#logger.debug("["+this.id()+"]["+player.uuid() +"] another player has lesser point than the player ");
-      result.set(player.uuid(), result.get(player.uuid()) + this.difficulty().malus);
+      scores.set(player.uuid(), scores.get(player.uuid()) + this.difficulty().malus);
     }
-    return result;
+    return {success: !affectMalus, scores: scores};
   }
 
   #computeScore(result){
