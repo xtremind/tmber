@@ -33,6 +33,7 @@ class GameScene extends Scene {
     console.log("GameScene.create");
     this.#centerX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     this.#centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    this.#displayedElements = new Map();
     this.#createBoard()
     this.#addListener()
     if(this.sys.game.reconnect){
