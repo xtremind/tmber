@@ -23,17 +23,33 @@ class GameScene extends Scene {
   
   #displayedElements = new Map();
 
+  #successSound;
+  #failedSound;
+
   constructor() {
     super({
       key: 'GameScene'
     });
   }
 
+  #reset(){
+    this.#players = new Map();
+    this.#scores= new Map();
+    this.#hand = [];
+    this.#discard = [];
+    this.#others = [];
+    this.#currentAction = Action.WAIT;    
+    this.#displayedElements = new Map();
+    
+    this.#successSound = this.sound.add('success', { loop: false });
+    this.#failedSound = this.sound.add('failed', { loop: false });
+  }
+
   create() {
     console.log("GameScene.create");
+    this.#reset()
     this.#centerX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     this.#centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    this.#displayedElements = new Map();
     this.#createBoard()
     this.#addListener()
     if(this.sys.game.reconnect){
@@ -258,6 +274,7 @@ class GameScene extends Scene {
     }
 
     //add sound
+    result.success ? this.#successSound.play() : this.#failedSound.play();
     
     this.#add('resultBoard', resultBoard);
   }

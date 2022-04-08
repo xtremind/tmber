@@ -2,6 +2,8 @@ import {Scene} from 'phaser';
 import cardTable from 'images/cardTable.png';
 import cards from 'images/cards.png';
 import cardAtlas from 'jsons/cards.json';
+import successSound from 'sounds/success.mp3'
+import failedSound from 'sounds/failed.mp3'
 
 class PreloadScene extends Scene {
     constructor() {
@@ -19,7 +21,7 @@ class PreloadScene extends Scene {
       const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
       const loadingLabel = this.add.text(screenCenterX, screenCenterY-30, 'Loading ...', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
       const progressPercent = this.add.text(screenCenterX, screenCenterY+30, '', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
-      const progressFile = this.add.text(screenCenterX, screenCenterY+60, '', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
+      const progressFile = this.add.text(screenCenterX, screenCenterY+90, '', { font: '30px Arial', fill: '#ffffff' }).setOrigin(0.5);
 
       const progressBox = this.add.graphics();
       progressBox.clear();
@@ -56,7 +58,9 @@ class PreloadScene extends Scene {
       //Load all assets
       this.load.image('cardTable', cardTable);
       this.load.atlas('cards', cards, cardAtlas);
-      //this.load.audio('playCard', 'public/audio/playcard.wav');
+      this.load.audio('success', successSound);
+      this.load.audio('failed', failedSound);
+      
     }
   }
   
