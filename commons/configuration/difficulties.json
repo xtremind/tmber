@@ -2,7 +2,7 @@
   "normal":
   {
     "minPlayers": 2,
-    "maxPlayers": 7,
+    "maxPlayers": 8,
     "startingHand": 5,
     "maxTmber": 7,
     "malus": 25,
@@ -12,7 +12,7 @@
   "hard":
   {
     "minPlayers": 3,
-    "maxPlayers": 7,
+    "maxPlayers": 8,
     "startingHand": 7,
     "maxTmber": 5,
     "malus": 30,
