@@ -449,7 +449,7 @@ class Game {
         this.#nextTurn()
       } else {
         this.#logger.debug("["+this.id()+"]["+player.uuid() +"] No more card to play - End Play");
-        this.#computeEndPlay(player, 0);
+        this.#computeEndPlay(player, -666);
       }
     } else {
       player.socket().emit('discard?', {'message' : 'bad selection, retry'});
